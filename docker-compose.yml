@@ -1,0 +1,28 @@
+services:
+  backend:
+    build:
+      context: ./delivery
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    container_name: delivery-backend
+  
+
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=delivery
+    container_name: delivery-db
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=myuser@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=mypassword
+    ports:
+      - "8088:80"
+    container_name: delivery-pgadmin
