@@ -41,4 +41,9 @@ public abstract class Timestamped {
 
   @Column
   private Long deletedBy;
+
+  public void updateDelete(Long userId) {
+    this.deletedAt = LocalDateTime.now();
+    this.deletedBy = userId;
+  }
 }
