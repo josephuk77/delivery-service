@@ -1,5 +1,6 @@
-package com.sparta.delivery.aaglobal;
+package com.sparta.delivery.aconfig;
 
+import com.sparta.delivery.aaglobal.AuditorAwareImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
