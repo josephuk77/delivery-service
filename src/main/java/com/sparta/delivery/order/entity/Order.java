@@ -1,6 +1,7 @@
 package com.sparta.delivery.order.entity;
 
 import com.sparta.delivery.aaglobal.Timestamped;
+import com.sparta.delivery.order.dto.OrderRequestDto;
 import com.sparta.delivery.store.entity.Store;
 import com.sparta.delivery.user.entity.User;
 import jakarta.persistence.Column;
@@ -50,4 +51,14 @@ public class Order extends Timestamped {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "store_id")
   private Store store;
+
+  public Order(OrderRequestDto requestDto, User user, Store store) {
+    this.request = requestDto.getRequest();
+    this.address = requestDto.getAddress();
+    this.totalPrice = Integer.parseInt(requestDto.getTotalPrice());
+    this.isDelivery = requestDto.isDelivery();
+    this.status = requestDto.getStatus();
+    this.user = user;
+    this.store = store;
+  }
 }
