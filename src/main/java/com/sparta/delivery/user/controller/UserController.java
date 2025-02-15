@@ -1,6 +1,6 @@
 package com.sparta.delivery.user.controller;
 
-import com.sparta.delivery.user.dto.UserRequestDto;
+import com.sparta.delivery.user.dto.SignupRequestDto;
 import com.sparta.delivery.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping("/signup")
-  public ResponseEntity<?> signup(@Valid @RequestBody UserRequestDto requestDto) {
+  public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDto requestDto) {
     userService.signup(requestDto);
     return ResponseEntity.status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
   }

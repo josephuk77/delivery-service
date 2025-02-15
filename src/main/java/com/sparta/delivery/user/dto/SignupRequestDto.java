@@ -3,7 +3,7 @@ package com.sparta.delivery.user.dto;
 import lombok.Getter;
 
 @Getter
-public class UserRequestDto {
+public class SignupRequestDto {
 
   private String nickname;
   private String email;

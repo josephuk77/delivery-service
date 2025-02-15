@@ -1,6 +1,6 @@
 package com.sparta.delivery.user.service;
 
-import com.sparta.delivery.user.dto.UserRequestDto;
+import com.sparta.delivery.user.dto.SignupRequestDto;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
 import com.sparta.delivery.user.repository.UserRepository;
@@ -15,7 +15,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
-  public void signup(UserRequestDto requestDto) {
+  public void signup(SignupRequestDto requestDto) {
     emailDuplicationCheck(requestDto.getEmail());
     String password = passwordEncoder.encode(requestDto.getPassword());
 

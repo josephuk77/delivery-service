@@ -1,7 +1,7 @@
 package com.sparta.delivery.user.entity;
 
 import com.sparta.delivery.aaglobal.Timestamped;
-import com.sparta.delivery.user.dto.UserRequestDto;
+import com.sparta.delivery.user.dto.SignupRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -40,7 +40,7 @@ public class User extends Timestamped {
   @Column
   private String currentAddress;
 
-  public User(UserRequestDto requestDto, String password, UserRoleEnum role) {
+  public User(SignupRequestDto requestDto, String password, UserRoleEnum role) {
     this.nickname = requestDto.getNickname();
     this.email = requestDto.getEmail();
     this.password = password;
