@@ -1,7 +1,7 @@
 package com.sparta.delivery.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.delivery.user.dto.LoginRequestDto;
+import com.sparta.delivery.user.dto.UserRequestDto;
 import com.sparta.delivery.user.entity.UserRoleEnum;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,8 +28,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   public Authentication attemptAuthentication
       (HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
     try {
-      LoginRequestDto requestDto = new ObjectMapper()
-          .readValue(request.getInputStream(), LoginRequestDto.class);
+      UserRequestDto requestDto = new ObjectMapper()
+          .readValue(request.getInputStream(), UserRequestDto.class);
 
       return getAuthenticationManager().authenticate(
           new UsernamePasswordAuthenticationToken(

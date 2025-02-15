@@ -1,6 +1,6 @@
 package com.sparta.delivery.user.service;
 
-import com.sparta.delivery.user.dto.SignupRequestDto;
+import com.sparta.delivery.user.dto.UserRequestDto;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
 import com.sparta.delivery.user.repository.UserRepository;
@@ -15,7 +15,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
-  public void signup(SignupRequestDto requestDto) {
+  public void signup(UserRequestDto requestDto) {
     emailDuplicationCheck(requestDto.getEmail());
     String password = passwordEncoder.encode(requestDto.getPassword());
 
@@ -31,4 +31,5 @@ public class UserService {
       throw new IllegalArgumentException("이미 가입된 이메일입니다.");
     });
   }
+
 }

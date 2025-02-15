@@ -1,12 +1,14 @@
 package com.sparta.delivery.user.dto;
 
+import jakarta.validation.constraints.Email;
 import lombok.Getter;
 
 @Getter
-public class SignupRequestDto {
+public class UserRequestDto {
 
-  private String nickname;
+  @Email
   private String email;
+  private String nickname;
   private String password;
   private boolean isOwner;
 }

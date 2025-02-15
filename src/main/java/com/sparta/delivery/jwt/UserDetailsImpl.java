@@ -21,6 +21,10 @@ public class UserDetailsImpl implements UserDetails {
     return Collections.singleton(new SimpleGrantedAuthority(user.getRole().toString()));
   }
 
+  public User getUser() {
+    return user;
+  }
+
   @Override
   public String getPassword() {
     return user.getPassword();
@@ -31,7 +35,7 @@ public class UserDetailsImpl implements UserDetails {
     return user.getEmail();
   }
 
-  public UserRoleEnum getRole(){
+  public UserRoleEnum getRole() {
     return user.getRole();
   }
 
