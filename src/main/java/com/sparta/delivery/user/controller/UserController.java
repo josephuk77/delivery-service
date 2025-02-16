@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,5 +41,11 @@ public class UserController {
       @Valid @RequestBody UserRequestDto requestDto) {
     userService.update(userDetails.getUser(), requestDto);
     return ResponseEntity.ok("회원정보 수정이 완료되었습니다.");
+  }
+
+  @DeleteMapping
+  public ResponseEntity<?> delete(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    userService.delete(userDetails.getUser());
+    return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
   }
 }

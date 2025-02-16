@@ -5,7 +5,6 @@ import com.sparta.delivery.user.dto.UserResponseDto;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
 import com.sparta.delivery.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,9 +31,13 @@ public class UserService {
     return new UserResponseDto(user);
   }
 
-  @Transactional
   public void update(User user, UserRequestDto requestDto) {
     user.update(requestDto);
+    userRepository.save(user);
+  }
+
+  public void delete(User user) {
+    user.updateDelete(user.getId());
     userRepository.save(user);
   }
 
