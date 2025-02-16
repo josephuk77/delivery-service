@@ -52,12 +52,12 @@ public class UserService {
     return new UserResponseDto(user);
   }
 
-  public void update(User user, UserRequestDto requestDto) {
+  public void updateUser(User user, UserRequestDto requestDto) {
     user.update(requestDto);
     userRepository.save(user);
   }
 
-  public void delete(User user) {
+  public void deleteUser(User user) {
     user.updateDelete(user.getId());
     userRepository.save(user);
   }

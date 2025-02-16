@@ -37,21 +37,22 @@ public class UserController {
   }
 
   @GetMapping
-  public ResponseEntity<UserResponseDto> get(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+  public ResponseEntity<UserResponseDto> getUser(
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
     UserResponseDto responseDto = userService.getUser(userDetails.getUser());
     return ResponseEntity.ok(responseDto);
   }
 
   @PatchMapping
-  public ResponseEntity<?> update(@AuthenticationPrincipal UserDetailsImpl userDetails,
+  public ResponseEntity<?> updateUser(@AuthenticationPrincipal UserDetailsImpl userDetails,
       @Valid @RequestBody UserRequestDto requestDto) {
-    userService.update(userDetails.getUser(), requestDto);
+    userService.updateUser(userDetails.getUser(), requestDto);
     return ResponseEntity.ok("회원정보 수정이 완료되었습니다.");
   }
 
   @DeleteMapping
-  public ResponseEntity<?> delete(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-    userService.delete(userDetails.getUser());
+  public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    userService.deleteUser(userDetails.getUser());
     return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
   }
 }
