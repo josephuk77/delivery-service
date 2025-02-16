@@ -7,6 +7,7 @@ import com.sparta.delivery.order.repository.OrderRepository;
 import com.sparta.delivery.store.entity.Store;
 import com.sparta.delivery.store.repository.StoreRepository;
 import com.sparta.delivery.user.entity.User;
+import com.sparta.delivery.user.entity.UserRoleEnum;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
@@ -54,5 +55,14 @@ public class OrderService {
     order.updateIsDelivery(isDelivery);
   }
 
-  
+  public void deleteOrder(UUID orderId, User user) {
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
+
+    if (user.getRole().equals(UserRoleEnum.MASTER)) {
+      throw new IllegalArgumentException("관리자만 주문을 삭제할 수 있습니다.");
+    }
+
+    orderRepository.delete(order);
+  }
 }
