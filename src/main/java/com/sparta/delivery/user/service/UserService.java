@@ -7,6 +7,7 @@ import com.sparta.delivery.user.entity.UserRoleEnum;
 import com.sparta.delivery.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,8 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
-  private final String ADMIN_KEY = "deliveryServiceAdminKey";
+  @Value("${admin.key}")
+  private String ADMIN_KEY;
 
   @Transactional
   public void signup(UserRequestDto requestDto) {
@@ -29,10 +31,11 @@ public class UserService {
     User user = new User(requestDto, password, role);
     userRepository.save(user);
 
+    user = findUser(user.getId());
     user.updateSignupByUserId(user.getId());
-    userRepository.save(user);
   }
 
+  @Transactional
   public void adminSignup(UserRequestDto requestDto) {
     duplicationCheck(requestDto.getUsername(), requestDto.getEmail());
     checkAdminKey(requestDto.getAdminKey());
@@ -41,8 +44,8 @@ public class UserService {
     User user = new User(requestDto, password, UserRoleEnum.MASTER);
     userRepository.save(user);
 
+    user = findUser(user.getId());
     user.updateSignupByUserId(user.getId());
-    userRepository.save(user);
   }
 
   public UserResponseDto getUser(User user) {
@@ -70,8 +73,13 @@ public class UserService {
   }
 
   private void checkAdminKey(String adminKey) {
-    if (!ADMIN_KEY.equals(adminKey)) {
+    if (!adminKey.equals(ADMIN_KEY)) {
       throw new IllegalArgumentException("관리자 키가 일치하지 않습니다.");
     }
+  }
+
+  private User findUser(Long id) {
+    return userRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
   }
 }
