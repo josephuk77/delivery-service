@@ -5,6 +5,7 @@ import com.sparta.delivery.user.dto.UserResponseDto;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
 import com.sparta.delivery.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
+  private final String ADMIN_KEY = "deliveryServiceAdminKey";
+
+  @Transactional
   public void signup(UserRequestDto requestDto) {
     emailDuplicationCheck(requestDto.getEmail());
     String password = passwordEncoder.encode(requestDto.getPassword());
@@ -24,6 +28,21 @@ public class UserService {
     UserRoleEnum role = requestDto.isOwner() ? UserRoleEnum.OWNER : UserRoleEnum.CUSTOMER;
 
     User user = new User(requestDto, password, role);
+    userRepository.save(user);
+
+    user.updateSignupByUserId(user.getId());
+    userRepository.save(user);
+  }
+
+  public void adminSignup(UserRequestDto requestDto) {
+    emailDuplicationCheck(requestDto.getEmail());
+    String password = passwordEncoder.encode(requestDto.getPassword());
+
+    if (!requestDto.getAdminKey().equals(ADMIN_KEY)) {
+      throw new IllegalArgumentException("관리자 키가 올바르지 않습니다.");
+    }
+
+    User user = new User(requestDto, password, UserRoleEnum.MASTER);
     userRepository.save(user);
   }
 

@@ -10,6 +10,7 @@ public class UserRequestDto {
   private String email;
   private String nickname;
   private String password;
-  private boolean isOwner;
+  private boolean owner;
   private String currentAddress;
+  private String adminKey;
 }
