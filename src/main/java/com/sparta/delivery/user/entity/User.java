@@ -46,4 +46,9 @@ public class User extends Timestamped {
     this.password = password;
     this.role = role;
   }
+  
+  public void update(UserRequestDto requestDto) {
+    this.nickname = requestDto.getNickname();
+    this.currentAddress = requestDto.getCurrentAddress();
+  }
 }

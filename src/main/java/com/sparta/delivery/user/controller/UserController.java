@@ -1,11 +1,16 @@
 package com.sparta.delivery.user.controller;
 
+import com.sparta.delivery.jwt.UserDetailsImpl;
 import com.sparta.delivery.user.dto.UserRequestDto;
+import com.sparta.delivery.user.dto.UserResponseDto;
 import com.sparta.delivery.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,5 +27,18 @@ public class UserController {
   public ResponseEntity<?> signup(@Valid @RequestBody UserRequestDto requestDto) {
     userService.signup(requestDto);
     return ResponseEntity.status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
+  }
+
+  @GetMapping
+  public ResponseEntity<UserResponseDto> get(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    UserResponseDto responseDto = userService.getUser(userDetails.getUser());
+    return ResponseEntity.ok(responseDto);
+  }
+
+  @PatchMapping
+  public ResponseEntity<?> update(@AuthenticationPrincipal UserDetailsImpl userDetails,
+      @Valid @RequestBody UserRequestDto requestDto) {
+    userService.update(userDetails.getUser(), requestDto);
+    return ResponseEntity.ok("회원정보 수정이 완료되었습니다.");
   }
 }

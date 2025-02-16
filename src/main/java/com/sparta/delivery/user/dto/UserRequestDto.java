@@ -11,4 +11,5 @@ public class UserRequestDto {
   private String nickname;
   private String password;
   private boolean isOwner;
+  private String currentAddress;
 }
