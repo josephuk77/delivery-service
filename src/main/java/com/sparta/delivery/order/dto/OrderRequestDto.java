@@ -1,11 +1,9 @@
 package com.sparta.delivery.order.dto;
 
 import com.sparta.delivery.order.entity.OrderStatus;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class OrderRequestDto {
 
   private String request;

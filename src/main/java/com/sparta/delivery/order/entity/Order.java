@@ -17,10 +17,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "p_orders")
 @Getter
+@NoArgsConstructor
 public class Order extends Timestamped {
 
   @Id
@@ -44,11 +46,11 @@ public class Order extends Timestamped {
   @Column(name = "order_status", nullable = false)
   private OrderStatus status;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "user_id")
   private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "store_id")
   private Store store;
 
@@ -60,5 +62,9 @@ public class Order extends Timestamped {
     this.status = requestDto.getStatus();
     this.user = user;
     this.store = store;
+  }
+
+  public void updateIsDelivery(boolean isDelivery) {
+    this.isDelivery = isDelivery;
   }
 }

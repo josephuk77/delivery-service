@@ -1,12 +1,14 @@
 package com.sparta.delivery.order.service;
 
+import com.sparta.delivery.order.dto.OrderDetailResponseDto;
 import com.sparta.delivery.order.dto.OrderRequestDto;
-import com.sparta.delivery.order.dto.OrderResponseDto;
 import com.sparta.delivery.order.entity.Order;
 import com.sparta.delivery.order.repository.OrderRepository;
 import com.sparta.delivery.store.entity.Store;
 import com.sparta.delivery.store.repository.StoreRepository;
 import com.sparta.delivery.user.entity.User;
+import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,13 +28,31 @@ public class OrderService {
     orderRepository.save(new Order(orderRequest, user, store));
   }
 
-  public OrderResponseDto getOrder(UUID orderId, User user) {
+  public OrderDetailResponseDto getOrderDetail(UUID orderId, User user) {
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
 
     Store store = storeRepository.findById(order.getStore().getId())
         .orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
 
-    return new OrderResponseDto(order, store, user);
+    return new OrderDetailResponseDto(order, store, user);
   }
+
+  public List<OrderRequestDto> getOrderList(User user) {
+    return orderRepository.findAllByUser(user);
+  }
+
+  @Transactional
+  public void updateOrderStatus(UUID orderId, boolean isDelivery, User user) {
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
+
+    if (!order.getUser().getId().equals(user.getId())) {
+      throw new IllegalArgumentException("본인의 주문만 수정할 수 있습니다.");
+    }
+
+    order.updateIsDelivery(isDelivery);
+  }
+
+  
 }

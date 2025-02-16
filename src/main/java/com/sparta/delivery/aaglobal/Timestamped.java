@@ -23,22 +23,32 @@ public abstract class Timestamped {
   @Temporal(TemporalType.TIMESTAMP)
   private LocalDateTime createdAt;
 
-  @CreatedBy
   @Column
-  private String createdBy;
+  @CreatedBy
+  private Long createdBy;
 
   @LastModifiedDate
   @Column
   @Temporal(TemporalType.TIMESTAMP)
   private LocalDateTime updatedAt;
 
-  @LastModifiedBy
   @Column
-  private String updatedBy;
+  @LastModifiedBy
+  private Long updatedBy;
 
   @Column
   private LocalDateTime deletedAt;
 
   @Column
-  private String deletedBy;
+  private Long deletedBy;
+
+  public void updateDelete(Long userId) {
+    this.deletedAt = LocalDateTime.now();
+    this.deletedBy = userId;
+  }
+
+  public void updateSignupByUserId(Long userId) {
+    this.createdBy = userId;
+    this.updatedBy = userId;
+  }
 }
