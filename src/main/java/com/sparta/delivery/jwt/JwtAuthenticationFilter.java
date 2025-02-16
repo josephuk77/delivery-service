@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
       return getAuthenticationManager().authenticate(
           new UsernamePasswordAuthenticationToken(
-              requestDto.getEmail(),
+              requestDto.getUsername(),
               requestDto.getPassword(),
               null
           )
@@ -47,10 +47,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   @Override
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain, Authentication authResult) throws IOException, ServletException {
-    String email = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
+    String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
     UserRoleEnum role = ((UserDetailsImpl) authResult.getPrincipal()).getRole();
 
-    String token = jwtUtil.createAccessToken(email, role);
+    String token = jwtUtil.createAccessToken(username, role);
     jwtUtil.addJwtToCookie(token, response);
   }
 

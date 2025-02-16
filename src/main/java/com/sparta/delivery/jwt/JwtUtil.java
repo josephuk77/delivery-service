@@ -45,11 +45,11 @@ public class JwtUtil {
     key = Keys.hmacShaKeyFor(bytes);
   }
 
-  public String createAccessToken(String email, UserRoleEnum role) {
+  public String createAccessToken(String username, UserRoleEnum role) {
     Date date = new Date();
 
     return BEARER_PREFIX + Jwts.builder()
-        .setSubject(email)
+        .setSubject(username)
         .claim(AUTHORIZATION_KEY, role)
         .setExpiration(new Date(date.getTime() + ACCESS_TIME))
         .setIssuedAt(date)

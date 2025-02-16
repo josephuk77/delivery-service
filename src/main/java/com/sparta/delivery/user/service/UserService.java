@@ -21,12 +21,11 @@ public class UserService {
 
   @Transactional
   public void signup(UserRequestDto requestDto) {
-    emailDuplicationCheck(requestDto.getEmail());
-    String password = passwordEncoder.encode(requestDto.getPassword());
+    duplicationCheck(requestDto.getUsername(), requestDto.getEmail());
 
     // 사용자 role은 OWNER 또는 CUSTOMER로 설정, MASTER는 관리자 api로 구현
     UserRoleEnum role = requestDto.isOwner() ? UserRoleEnum.OWNER : UserRoleEnum.CUSTOMER;
-
+    String password = passwordEncoder.encode(requestDto.getPassword());
     User user = new User(requestDto, password, role);
     userRepository.save(user);
 
@@ -35,14 +34,14 @@ public class UserService {
   }
 
   public void adminSignup(UserRequestDto requestDto) {
-    emailDuplicationCheck(requestDto.getEmail());
+    duplicationCheck(requestDto.getUsername(), requestDto.getEmail());
+    checkAdminKey(requestDto.getAdminKey());
+
     String password = passwordEncoder.encode(requestDto.getPassword());
-
-    if (!requestDto.getAdminKey().equals(ADMIN_KEY)) {
-      throw new IllegalArgumentException("관리자 키가 올바르지 않습니다.");
-    }
-
     User user = new User(requestDto, password, UserRoleEnum.MASTER);
+    userRepository.save(user);
+
+    user.updateSignupByUserId(user.getId());
     userRepository.save(user);
   }
 
@@ -60,9 +59,19 @@ public class UserService {
     userRepository.save(user);
   }
 
-  private void emailDuplicationCheck(String email) {
+  private void duplicationCheck(String username, String email) {
+    userRepository.findByUsername(username).ifPresent((m) -> {
+      throw new IllegalArgumentException("이미 존재하는 사용자 이름입니다.");
+    });
+
     userRepository.findByEmail(email).ifPresent((m) -> {
       throw new IllegalArgumentException("이미 가입된 이메일입니다.");
     });
+  }
+
+  private void checkAdminKey(String adminKey) {
+    if (!ADMIN_KEY.equals(adminKey)) {
+      throw new IllegalArgumentException("관리자 키가 일치하지 않습니다.");
+    }
   }
 }

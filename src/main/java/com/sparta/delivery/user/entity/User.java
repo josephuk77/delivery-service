@@ -24,6 +24,9 @@ public class User extends Timestamped {
   @Column(name = "user_id")
   private Long id;
 
+  @Column(nullable = false, unique = true)
+  private String username;
+
   @Column
   private String nickname;
 
@@ -41,13 +44,14 @@ public class User extends Timestamped {
   private String currentAddress;
 
   public User(UserRequestDto requestDto, String password, UserRoleEnum role) {
-    this.nickname = requestDto.getNickname();
+    this.username = requestDto.getUsername();
     this.email = requestDto.getEmail();
     this.password = password;
     this.role = role;
   }
-  
+
   public void update(UserRequestDto requestDto) {
+    this.email = requestDto.getEmail();
     this.nickname = requestDto.getNickname();
     this.currentAddress = requestDto.getCurrentAddress();
   }
