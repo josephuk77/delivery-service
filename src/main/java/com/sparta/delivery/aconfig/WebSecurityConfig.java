@@ -4,10 +4,12 @@ import com.sparta.delivery.jwt.JwtAuthenticationFilter;
 import com.sparta.delivery.jwt.JwtAuthorizationFilter;
 import com.sparta.delivery.jwt.JwtUtil;
 import com.sparta.delivery.user.service.UserDetailsServiceImpl;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +19,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +31,9 @@ public class WebSecurityConfig {
   private final JwtUtil jwtUtil;
   private final UserDetailsServiceImpl userDetailsService;
   private final AuthenticationConfiguration authenticationConfiguration;
+
+  private static final String GET = HttpMethod.GET.name();
+  private static final String POST = HttpMethod.POST.name();
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -61,8 +69,7 @@ public class WebSecurityConfig {
     http.authorizeHttpRequests((authorizeHttpRequests) ->
         authorizeHttpRequests
             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-            .requestMatchers("/").permitAll()
-            .requestMatchers("/users/**").permitAll()
+            .requestMatchers(publicEndPoints()).permitAll()
             .anyRequest().authenticated()
     );
 
@@ -70,5 +77,20 @@ public class WebSecurityConfig {
     http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
+  }
+
+  private RequestMatcher publicEndPoints() {
+    List<RequestMatcher> matchers = List.of(
+        // 회원가입, 로그인
+        new AntPathRequestMatcher("/users/signup", POST),
+        new AntPathRequestMatcher("/users/admin/signup", POST),
+        new AntPathRequestMatcher("/users/login", POST),
+
+        // 조회, 검색
+        new AntPathRequestMatcher("/stores/**", GET),
+        new AntPathRequestMatcher("/foods/**", GET),
+        new AntPathRequestMatcher("/reviews/**", GET)
+    );
+    return new OrRequestMatcher(matchers);
   }
 }

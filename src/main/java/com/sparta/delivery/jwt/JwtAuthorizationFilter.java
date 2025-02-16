@@ -36,7 +36,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     String tokenValue = jwtUtil.getTokenFromRequest(req);
-    System.out.println("tokenValue = " + tokenValue);
 
     if (StringUtils.hasText(tokenValue)) {
       tokenValue = jwtUtil.substringToken(tokenValue);
