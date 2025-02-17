@@ -1,4 +1,4 @@
-package com.sparta.delivery.aaglobal;
+package com.sparta.delivery.aconfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
