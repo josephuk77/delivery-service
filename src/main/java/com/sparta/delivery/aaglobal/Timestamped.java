@@ -46,4 +46,9 @@ public abstract class Timestamped {
     this.deletedAt = LocalDateTime.now();
     this.deletedBy = userId;
   }
+
+  public void updateSignupByUserId(Long userId) {
+    this.createdBy = userId;
+    this.updatedBy = userId;
+  }
 }
