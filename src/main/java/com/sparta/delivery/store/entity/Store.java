@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -65,6 +66,14 @@ public class Store extends Timestamped {
     this.address = requestDto.getAddress();
     this.phone = requestDto.getPhone();
     this.user = user;
+  }
+
+  public void update(StoreRequestDto requestDto) {
+    this.category = StoreCategory.fromString(requestDto.getCategory());
+    this.name = requestDto.getName();
+    this.content = requestDto.getContent();
+    this.address = requestDto.getAddress();
+    this.phone = requestDto.getPhone();
   }
 }
 

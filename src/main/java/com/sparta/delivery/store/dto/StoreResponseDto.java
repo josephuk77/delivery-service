@@ -1,7 +1,6 @@
 package com.sparta.delivery.store.dto;
 
 import com.sparta.delivery.store.entity.Store;
-import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,8 +17,6 @@ public class StoreResponseDto {
   private String content;
   private String address;
   private String phone;
-  private BigDecimal ratingAvg;
-  private Integer reviewCount;
 
   public StoreResponseDto(Store store) {
     this.id = store.getId();
