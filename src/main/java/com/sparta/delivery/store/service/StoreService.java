@@ -1,6 +1,7 @@
 package com.sparta.delivery.store.service;
 
 import com.sparta.delivery.aaglobal.GlobalException;
+import com.sparta.delivery.jwt.UserDetailsImpl;
 import com.sparta.delivery.store.dto.StoreRequestDto;
 import com.sparta.delivery.store.dto.StoreResponseDto;
 import com.sparta.delivery.store.entity.Store;
@@ -40,7 +41,7 @@ public class StoreService {
   }
 
   @Transactional
-  public StoreResponseDto updateStore(UUID storeId, @Valid StoreRequestDto requestDto, User user) {
+  public StoreResponseDto updateStore(UUID storeId, StoreRequestDto requestDto, User user) {
     // 사용자 존재 여부 확인
     userRepository.findByUsername(user.getUsername())
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 사용자입니다."));
@@ -61,6 +62,5 @@ public class StoreService {
 
     return new StoreResponseDto(store);
   }
-
 
 }
