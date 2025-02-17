@@ -1,5 +1,6 @@
 package com.sparta.delivery.jwt;
 
+import com.sparta.delivery.aaglobal.GlobalException;
 import com.sparta.delivery.user.entity.UserRoleEnum;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -22,6 +23,7 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -74,20 +76,24 @@ public class JwtUtil {
     if (token.startsWith(BEARER_PREFIX)) {
       return token.substring(BEARER_PREFIX.length());
     }
-    throw new IllegalArgumentException("토큰이 올바르지 않습니다.");
+    throw new GlobalException(HttpStatus.BAD_REQUEST, "토큰이 올바르지 않습니다.");
   }
 
   public void validateToken(String token) {
     try {
       Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     } catch (SecurityException | MalformedJwtException | SignatureException e) {
-      throw new IllegalArgumentException("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+      throw new GlobalException(HttpStatus.BAD_REQUEST,
+          "Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
     } catch (ExpiredJwtException e) {
-      throw new IllegalArgumentException("Expired JWT token, 만료된 JWT token 입니다.");
+      throw new GlobalException(HttpStatus.BAD_REQUEST,
+          "Expired JWT token, 만료된 JWT token 입니다.");
     } catch (UnsupportedJwtException e) {
-      throw new IllegalArgumentException("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+      throw new GlobalException(HttpStatus.BAD_REQUEST,
+          "Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
     } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+      throw new GlobalException(HttpStatus.BAD_REQUEST,
+          "JWT claims is empty, 잘못된 JWT 토큰 입니다.");
     }
   }
 
