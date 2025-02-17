@@ -51,13 +51,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     UserRoleEnum role = ((UserDetailsImpl) authResult.getPrincipal()).getRole();
 
     String token = jwtUtil.createAccessToken(username, role);
-    jwtUtil.addJwtToCookie(token, response);
+    jwtUtil.addJwtToHeader(token, response);
   }
 
   @Override
   protected void unsuccessfulAuthentication
       (HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
       throws IOException, ServletException {
+    log.error(failed.getMessage());
     response.setStatus(401);
   }
 }
