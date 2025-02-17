@@ -7,6 +7,7 @@ import com.sparta.delivery.gemini.repository.GeminiRepository;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,6 +19,9 @@ public class GeminiService {
   private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱을 위한 ObjectMapper
   private final WebClient webClient;
   private final GeminiRepository geminiRepository;
+
+  @Value("${gemini.secret.key}")
+  private String secretKey;
 
   public String sendJsonRequest(String question) {
 
@@ -50,7 +54,7 @@ public class GeminiService {
   private String sendGeminiAndGetJsonData(Map<String, Object> requestBody){
     return  webClient.post()
         .uri(uriBuilder -> uriBuilder
-            .queryParam("key", "{secretkey를 입력해야 합니다. }")
+            .queryParam("key", secretKey)
             .build()) // 실제 요청할 엔드포인트로 변경
         .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(requestBody) // JSON 데이터 추가
