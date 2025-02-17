@@ -4,12 +4,14 @@ import com.sparta.delivery.jwt.UserDetailsImpl;
 import com.sparta.delivery.store.dto.StoreRequestDto;
 import com.sparta.delivery.store.dto.StoreResponseDto;
 import com.sparta.delivery.store.service.StoreService;
+import com.sparta.delivery.user.entity.User;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -40,5 +42,13 @@ public class StoreController {
   ) {
     StoreResponseDto responseDto = storeService.updateStore(store_id, requestDto, userDetails.getUser());
     return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+  }
+
+  @DeleteMapping("/{store_id}")
+  public ResponseEntity<?> deleteStore(
+      @PathVariable UUID store_id,
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    storeService.deleteStore(store_id, userDetails.getUser());
+    return ResponseEntity.status(HttpStatus.OK).body("삭제가 완료되었습니다.");
   }
 }
