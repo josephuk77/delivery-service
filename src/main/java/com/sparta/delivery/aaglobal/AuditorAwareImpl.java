@@ -1,0 +1,27 @@
+package com.sparta.delivery.aaglobal;
+
+import com.sparta.delivery.jwt.UserDetailsImpl;
+import java.util.Optional;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+public class AuditorAwareImpl implements AuditorAware<Long> {
+
+  @Override
+  public Optional<Long> getCurrentAuditor() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    if (authentication == null || !authentication.isAuthenticated()) {
+      return Optional.empty();
+    }
+
+    Object principal = authentication.getPrincipal();
+    if (principal instanceof UserDetailsImpl) {
+      Long userId = ((UserDetailsImpl) principal).getUser().getId();
+      return Optional.of(userId);
+    }
+
+    return Optional.empty();
+  }
+}
