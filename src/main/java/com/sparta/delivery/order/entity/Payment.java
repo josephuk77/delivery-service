@@ -1,6 +1,8 @@
 package com.sparta.delivery.order.entity;
 
 import com.sparta.delivery.aaglobal.Timestamped;
+import com.sparta.delivery.order.dto.PaymentRequestDto;
+import com.sparta.delivery.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,10 +16,12 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "p_payments")
+@NoArgsConstructor
 public class Payment extends Timestamped {
 
   @Id
@@ -29,7 +33,7 @@ public class Payment extends Timestamped {
   private String username;
 
   @Column(name = "order_price")
-  private String price;
+  private int price;
 
   @Column(name = "payment_status", nullable = false)
   @Enumerated(value = EnumType.STRING)
@@ -38,4 +42,11 @@ public class Payment extends Timestamped {
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "order_id")
   private Order order;
+
+  public Payment(PaymentRequestDto requestDto, User user, Order order) {
+    this.username = user.getNickname();
+    this.price = requestDto.getPrice();
+    this.status = requestDto.getStatus();
+    this.order = order;
+  }
 }
