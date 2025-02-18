@@ -62,4 +62,8 @@ public class Food extends Timestamped {
   public void updateStore(Store store) {
     this.store = store;
   }
+
+  public void updateVisible(boolean isVisible) {
+    this.isVisible = isVisible;
+  }
 }

@@ -92,4 +92,14 @@ public class FoodService {
 
         return this.foodRepository.findByName(keyword);
     }
+
+    public String visibleFood(UUID foodId, boolean isVisible) {
+        Food food = this.foodRepository.findById(foodId).orElseThrow(()->
+                new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 음식 입니다. "));
+
+        food.updateVisible(isVisible);
+        this.foodRepository.save(food);
+
+        return isVisible ? "숨김처리 해제 되었습니다. " : "숨김처리 되었습니다. ";
+    }
 }
