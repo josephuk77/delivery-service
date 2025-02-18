@@ -86,16 +86,11 @@ public class FoodService {
             throw new GlobalException(HttpStatus.FORBIDDEN, "해당 권한을 가지고 있지 않습니다. ");
         }
 
-        Optional<Food> food = this.foodRepository.findById(foodId);
+        Food food = this.foodRepository.findById(foodId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "해당하는 음식이 없습니다. "));
+        food.updateDelete(userDetails.getUser().getId());
+        this.foodRepository.save(food);
 
-        if (food.isPresent()) {
-
-            foodRepository.delete(food.get());
-            return "삭제 완료";
-        } else {
-
-            throw new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 음식 입니다.");
-        }
+        return "삭제 완료";
     }
 
     public List<Food> listFood(String keyword) {
