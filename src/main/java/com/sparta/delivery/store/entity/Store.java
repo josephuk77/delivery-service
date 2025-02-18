@@ -49,10 +49,10 @@ public class Store extends Timestamped {
   private String phone;
 
   @Column
-  private Integer reviewCount;
+  private Integer reviewCount = 0;
 
-  @Column
-  private BigDecimal ratingAvg;
+  @Column(precision = 3, scale = 1)
+  private BigDecimal ratingAvg = BigDecimal.ZERO;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")

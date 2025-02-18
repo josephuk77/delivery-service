@@ -1,6 +1,9 @@
 package com.sparta.delivery.store.service;
 
 import com.sparta.delivery.aaglobal.GlobalException;
+import com.sparta.delivery.food.entity.Food;
+import com.sparta.delivery.food.repository.FoodRepository;
+import com.sparta.delivery.store.dto.StoreDetailResponseDto;
 import com.sparta.delivery.store.dto.StoreRequestDto;
 import com.sparta.delivery.store.dto.StoreResponseDto;
 import com.sparta.delivery.store.entity.Store;
@@ -8,6 +11,7 @@ import com.sparta.delivery.store.repository.StoreRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
 import com.sparta.delivery.user.repository.UserRepository;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +24,20 @@ public class StoreService {
 
   private final StoreRepository storeRepository;
   private final UserRepository userRepository;
+  private final FoodRepository foodRepository;
+
+  // 특정 음식점 조회
+  @Transactional(readOnly = true)
+  public StoreDetailResponseDto getStore(UUID storeId) {
+    Store store = storeRepository.findById(storeId)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 가게입니다."));
+
+    List<Food> foods = foodRepository.findAllByStoreId(storeId);
+
+    return new StoreDetailResponseDto(storeId, String.valueOf(store.getCategory()), store.getName(),
+        store.getContent(), store.getAddress(), store.getPhone(), store.getRatingAvg(),
+        store.getReviewCount(), foods);
+  }
 
   @Transactional
   public StoreResponseDto createStore(StoreRequestDto requestDto, User user) {

@@ -1,6 +1,7 @@
 package com.sparta.delivery.store.controller;
 
 import com.sparta.delivery.jwt.UserDetailsImpl;
+import com.sparta.delivery.store.dto.StoreDetailResponseDto;
 import com.sparta.delivery.store.dto.StoreRequestDto;
 import com.sparta.delivery.store.dto.StoreResponseDto;
 import com.sparta.delivery.store.service.StoreService;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -25,6 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class StoreController {
 
   private final StoreService storeService;
+
+  @GetMapping("/{store_id}")
+  public ResponseEntity<StoreDetailResponseDto> getStore(@PathVariable UUID store_id) {
+    StoreDetailResponseDto responseDto = storeService.getStore(store_id);
+    return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+  }
 
   @PostMapping
   public ResponseEntity<StoreResponseDto> createStore(
@@ -40,7 +48,8 @@ public class StoreController {
       @Valid @RequestBody StoreRequestDto requestDto,
       @AuthenticationPrincipal UserDetailsImpl userDetails
   ) {
-    StoreResponseDto responseDto = storeService.updateStore(store_id, requestDto, userDetails.getUser());
+    StoreResponseDto responseDto = storeService.updateStore(store_id, requestDto,
+        userDetails.getUser());
     return ResponseEntity.status(HttpStatus.OK).body(responseDto);
   }
 
