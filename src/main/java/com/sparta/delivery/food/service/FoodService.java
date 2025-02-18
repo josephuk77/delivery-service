@@ -48,15 +48,18 @@ public class FoodService {
 
 
     public FoodResponseDto getFood(UUID foodId) {
-        Optional<Food> food = this.foodRepository.findById(foodId);
+        Food food = this.foodRepository.findById(foodId).orElseThrow(() ->
+                new GlobalException(HttpStatus.NO_CONTENT, "해당하는 음식이 존재하지 않습니다. "));
 
-        if (food.isPresent()) {
-
-            return new FoodResponseDto(food.get());
-        } else {
-
-            throw new GlobalException(HttpStatus.NO_CONTENT, "해당하는 음식이 존재하지 않습니다. ");
+        if(!food.isVisible()){
+            throw new GlobalException(HttpStatus.FORBIDDEN, "숨김 처리된 음식 입니다. ");
         }
+
+        if(food.getDeletedAt() != null){
+            throw new GlobalException(HttpStatus.FORBIDDEN, "삭제된 음식 입니다. ");
+        }
+
+        return new FoodResponseDto(food);
     }
 
 
@@ -95,7 +98,10 @@ public class FoodService {
 
     public List<Food> listFood(String keyword) {
 
-        return this.foodRepository.findByName(keyword);
+        return this.foodRepository.findByName(keyword).stream()
+                .filter(Food::isVisible)
+                .filter(food -> food.getDeletedAt() == null)
+                .toList();
     }
 
     public String visibleFood(UUID foodId, boolean isVisible, UserDetailsImpl userDetails) {
