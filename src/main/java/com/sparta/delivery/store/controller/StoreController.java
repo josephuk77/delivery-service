@@ -5,7 +5,6 @@ import com.sparta.delivery.store.dto.StoreDetailResponseDto;
 import com.sparta.delivery.store.dto.StoreRequestDto;
 import com.sparta.delivery.store.dto.StoreResponseDto;
 import com.sparta.delivery.store.service.StoreService;
-import com.sparta.delivery.user.entity.User;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,8 @@ public class StoreController {
   @PostMapping
   public ResponseEntity<StoreResponseDto> createStore(
       @Valid @RequestBody StoreRequestDto requestDto,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+      @AuthenticationPrincipal UserDetailsImpl userDetails
+  ) {
     StoreResponseDto responseDto = storeService.createStore(requestDto, userDetails.getUser());
     return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
   }
@@ -56,7 +56,8 @@ public class StoreController {
   @DeleteMapping("/{store_id}")
   public ResponseEntity<?> deleteStore(
       @PathVariable UUID store_id,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+      @AuthenticationPrincipal UserDetailsImpl userDetails
+  ) {
     storeService.deleteStore(store_id, userDetails.getUser());
     return ResponseEntity.status(HttpStatus.OK).body("삭제가 완료되었습니다.");
   }
