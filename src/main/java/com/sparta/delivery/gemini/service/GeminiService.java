@@ -3,15 +3,23 @@ package com.sparta.delivery.gemini.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.delivery.aaglobal.GlobalException;
+import com.sparta.delivery.gemini.dto.GeminiResponseDto;
 import com.sparta.delivery.gemini.entity.Gemini;
 import com.sparta.delivery.gemini.repository.GeminiRepository;
+
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
+import com.sparta.delivery.jwt.UserDetailsImpl;
 import com.sparta.delivery.user.entity.User;
+import com.sparta.delivery.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,81 +29,89 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class GeminiService {
 
-  private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱을 위한 ObjectMapper
-  private final WebClient webClient;
-  private final GeminiRepository geminiRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱을 위한 ObjectMapper
+    private final WebClient webClient;
+    private final GeminiRepository geminiRepository;
+    private final UserRepository userRepository;
 
-  @Value("${gemini.secret.key}")
-  private String secretKey;
+    @Value("${gemini.secret.key}")
+    private String secretKey;
 
-  public String sendJsonRequest(String question, User user) throws JsonProcessingException {
+    public String sendJsonRequest(String question, UserDetailsImpl userDetails) throws JsonProcessingException {
 
-    // JSON 데이터 생성
-    Map<String, Object> requestBody = createMapObject(question);
+        // JSON 데이터 생성
+        Map<String, Object> requestBody = createMapObject(question);
 
-    // WebClient 요청하고 데이터 받아오기
-    String jsonData = sendGeminiAndGetJsonData(requestBody);
+        // WebClient 요청하고 데이터 받아오기
+        String jsonData = sendGeminiAndGetJsonData(requestBody);
 
-    // 응답에서 대답만 추출
-    String answer = extractTextFromJson(jsonData);
+        // 응답에서 대답만 추출
+        String answer = extractTextFromJson(jsonData);
 
-    // 해당 내용을 저장
-    save(question, answer, user);
+        // 해당 내용을 저장
+        save(question, answer, userDetails.getUser());
 
-    // 대답만 return
-    return answer;
-  }
-
-  private Map<String, Object> createMapObject(String question){
-    return Map.of(
-        "contents", List.of(
-            Map.of("parts", List.of(
-                Map.of("text", question)
-            ))
-        )
-    );
-  }
-
-  private String sendGeminiAndGetJsonData(Map<String, Object> requestBody){
-    return  webClient.post()
-        .uri(uriBuilder -> uriBuilder
-            .queryParam("key", secretKey)
-            .build()) // 실제 요청할 엔드포인트로 변경
-        .contentType(MediaType.APPLICATION_JSON)
-        .bodyValue(requestBody) // JSON 데이터 추가
-        .retrieve()
-        .bodyToMono(String.class) // 응답을 String으로 받음
-        .block(); // 동기 방식으로 실행
-  }
-
-  private void save(String question, String answer, User user) throws JsonProcessingException {
-    Gemini gemini = new Gemini(jsonToText(question), answer, user);
-
-    this.geminiRepository.save(gemini);
-  }
-
-  private String jsonToText(String jsonData) throws JsonProcessingException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(jsonData);
-
-    return jsonNode.get("message").asText();
-  }
-
-  private String extractTextFromJson(String jsonData) {
-    try {
-      JsonNode rootNode = objectMapper.readTree(jsonData);
-      return rootNode.path("candidates")
-          .get(0)  // 첫 번째 candidate
-          .path("content")
-          .path("parts")
-          .get(0)  // 첫 번째 part
-          .path("text")
-          .asText(); // "text" 값 추출
-    } catch (Exception e) {
-      e.printStackTrace();
-      return "Error parsing response JSON";
+        // 대답만 return
+        return answer;
     }
-  }
 
+
+    public String getGemini(UUID aiId) {
+        Gemini gemini = this.geminiRepository.findById(aiId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 아이디 입니다, "));
+        if (gemini.getDeletedAt() != null) {
+            throw new GlobalException(HttpStatus.NOT_ACCEPTABLE, "삭제된 메세지 입니다. ");
+        }
+        return gemini.getAnswer();
+    }
+
+    public List<GeminiResponseDto> getGeminiList(User user) {
+        log.info("getGeminiList : {}", user.toString());
+        return this.geminiRepository.findByUserId(user.getId()).stream().filter(gemini -> gemini.getDeletedAt() == null).map(GeminiResponseDto::new).toList();
+    }
+
+    public String deleteGemini(UUID aiId, User user) {
+
+        Gemini gemini = this.geminiRepository.findById(aiId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 내역입니다. "));
+        gemini.updateDelete(user.getId());
+        this.geminiRepository.save(gemini);
+
+        return "해당 내용이 삭제되었습니다. ";
+    }
+
+    private Map<String, Object> createMapObject(String question) {
+        return Map.of("contents", List.of(Map.of("parts", List.of(Map.of("text", question)))));
+    }
+
+    private String sendGeminiAndGetJsonData(Map<String, Object> requestBody) {
+        return webClient.post().uri(uriBuilder -> uriBuilder.queryParam("key", secretKey).build()) // 실제 요청할 엔드포인트로 변경
+                .contentType(MediaType.APPLICATION_JSON).bodyValue(requestBody) // JSON 데이터 추가
+                .retrieve().bodyToMono(String.class) // 응답을 String으로 받음
+                .block(); // 동기 방식으로 실행
+    }
+
+    private void save(String question, String answer, User user) throws JsonProcessingException {
+        Gemini gemini = new Gemini(jsonToText(question), answer, user);
+
+        this.geminiRepository.save(gemini);
+    }
+
+    private String jsonToText(String jsonData) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(jsonData);
+
+        return jsonNode.get("message").asText();
+    }
+
+    private String extractTextFromJson(String jsonData) {
+        try {
+            JsonNode rootNode = objectMapper.readTree(jsonData);
+            return rootNode.path("candidates").get(0)  // 첫 번째 candidate
+                    .path("content").path("parts").get(0)  // 첫 번째 part
+                    .path("text").asText(); // "text" 값 추출
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error parsing response JSON";
+        }
+    }
 
 }
