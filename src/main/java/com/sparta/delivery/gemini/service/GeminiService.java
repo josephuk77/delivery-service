@@ -6,6 +6,8 @@ import com.sparta.delivery.gemini.entity.Gemini;
 import com.sparta.delivery.gemini.repository.GeminiRepository;
 import java.util.List;
 import java.util.Map;
+
+import com.sparta.delivery.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -23,7 +25,7 @@ public class GeminiService {
   @Value("${gemini.secret.key}")
   private String secretKey;
 
-  public String sendJsonRequest(String question) {
+  public String sendJsonRequest(String question, User user) {
 
     // JSON 데이터 생성
     Map<String, Object> requestBody = createMapObject(question);
@@ -35,7 +37,7 @@ public class GeminiService {
     String answer = extractTextFromJson(jsonData);
 
     // 해당 내용을 저장
-    save(question, answer);
+    save(question, answer, user);
 
     // 대답만 return
     return answer;
@@ -63,8 +65,8 @@ public class GeminiService {
         .block(); // 동기 방식으로 실행
   }
 
-  private void save(String question, String answer){
-    Gemini gemini = new Gemini(question, answer, null);
+  private void save(String question, String answer, User user) {
+    Gemini gemini = new Gemini(question, answer, user);
 
     this.geminiRepository.save(gemini);
   }

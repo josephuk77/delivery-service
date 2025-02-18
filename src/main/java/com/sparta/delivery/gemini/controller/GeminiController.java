@@ -1,7 +1,9 @@
 package com.sparta.delivery.gemini.controller;
 
 import com.sparta.delivery.gemini.service.GeminiService;
+import com.sparta.delivery.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,8 +17,8 @@ public class GeminiController {
   private final GeminiService geminiService;
 
   @PostMapping()
-  public String getGemini(@RequestBody String message) {
+  public String createGemini(@RequestBody String message, @AuthenticationPrincipal User user) {
 
-    return this.geminiService.sendJsonRequest(message);
+    return this.geminiService.sendJsonRequest(message, user);
   }
 }
