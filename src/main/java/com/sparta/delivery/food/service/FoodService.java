@@ -10,7 +10,6 @@ import com.sparta.delivery.store.entity.Store;
 import com.sparta.delivery.store.repository.StoreRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import com.sparta.delivery.user.entity.UserRoleEnum;

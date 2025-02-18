@@ -31,7 +31,7 @@ public class FoodController {
 
   @GetMapping(value = "/{foodId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FoodResponseDto> getFood(@PathVariable UUID foodId) {
-    log.info("get food with id {}", foodId);
+
     return ResponseEntity.ok(this.foodService.getFood(foodId));
   }
 
@@ -58,7 +58,7 @@ public class FoodController {
   public String visibleFood(@PathVariable UUID foodId,
                             @RequestParam(required = false) boolean isVisible,
                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    log.info("visibleFood {}", foodId);
+
     return this.foodService.visibleFood(foodId, isVisible, userDetails);
   }
 
