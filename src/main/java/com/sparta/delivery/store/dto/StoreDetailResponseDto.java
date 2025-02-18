@@ -1,6 +1,6 @@
 package com.sparta.delivery.store.dto;
 
-import com.sparta.delivery.food.entity.Food;
+import com.sparta.delivery.food.dto.FoodWithStoreResponseDto;
 import com.sparta.delivery.store.entity.Store;
 import java.math.BigDecimal;
 import java.util.List;
@@ -22,17 +22,19 @@ public class StoreDetailResponseDto {
   private String phone;
   private BigDecimal ratingAvg;
   private Integer reviewCount;
-  private List<Food> foods;
+  private List<FoodWithStoreResponseDto> foods;
 
 
-  public StoreDetailResponseDto(UUID id, Store store) {
+  public StoreDetailResponseDto(Store store, BigDecimal ratingAvg, Integer reviewCount,
+      List<FoodWithStoreResponseDto> foods) {
     this.id = store.getId();
     this.category = String.valueOf(store.getCategory()).toUpperCase();
     this.name = store.getName();
     this.content = store.getContent();
     this.address = store.getAddress();
     this.phone = store.getPhone();
-    this.ratingAvg = store.getRatingAvg();
-    this.reviewCount = store.getReviewCount();
+    this.ratingAvg = ratingAvg;
+    this.reviewCount = reviewCount;
+    this.foods = foods;
   }
 }
