@@ -48,6 +48,7 @@ public class Food extends Timestamped {
     this.name = foodRequestDto.getFoodName();
     this.content = foodRequestDto.getContent();
     this.price = foodRequestDto.getPrice();
+    this.isVisible = true;
 
   }
 
