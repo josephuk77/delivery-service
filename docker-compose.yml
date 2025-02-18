@@ -18,6 +18,11 @@ services:
       - POSTGRES_PASSWORD=mypassword
       - POSTGRES_DB=delivery
     container_name: delivery-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
 
   pgadmin:
     image: dpage/pgadmin4
@@ -27,3 +32,6 @@ services:
     ports:
       - "8088:80"
     container_name: delivery-pgadmin
+
+volumes:
+  db_data:
