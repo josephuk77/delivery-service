@@ -14,6 +14,6 @@ public interface FoodRepository extends JpaRepository<Food, UUID> {
   @Query("SELECT f FROM Food f WHERE f.name = :foodName AND f.deletedAt IS NULL AND f.isVisible = true ORDER BY f.createdAt DESC")
   Page<Food> findByName(String foodName, Pageable pageable);
 
-  @Query("SELECT f FROM Food f LEFT JOIN FETCH f.store WHERE f.store.id = :storeId AND f.isVisible = true ")
+  @Query("SELECT f FROM Food f LEFT JOIN FETCH f.store WHERE f.store.id = :storeId AND f.isVisible = TRUE AND f.deletedAt IS NULL")
   List<Food> findAllByStoreId(UUID storeId);
 }
