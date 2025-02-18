@@ -1,5 +1,6 @@
 package com.sparta.delivery.gemini.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.delivery.gemini.entity.Gemini;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 import com.sparta.delivery.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GeminiService {
 
   private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱을 위한 ObjectMapper
@@ -25,7 +28,7 @@ public class GeminiService {
   @Value("${gemini.secret.key}")
   private String secretKey;
 
-  public String sendJsonRequest(String question, User user) {
+  public String sendJsonRequest(String question, User user) throws JsonProcessingException {
 
     // JSON 데이터 생성
     Map<String, Object> requestBody = createMapObject(question);
@@ -65,10 +68,17 @@ public class GeminiService {
         .block(); // 동기 방식으로 실행
   }
 
-  private void save(String question, String answer, User user) {
-    Gemini gemini = new Gemini(question, answer, user);
+  private void save(String question, String answer, User user) throws JsonProcessingException {
+    Gemini gemini = new Gemini(jsonToText(question), answer, user);
 
     this.geminiRepository.save(gemini);
+  }
+
+  private String jsonToText(String jsonData) throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(jsonData);
+
+    return jsonNode.get("message").asText();
   }
 
   private String extractTextFromJson(String jsonData) {

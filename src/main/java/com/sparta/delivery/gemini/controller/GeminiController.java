@@ -1,5 +1,6 @@
 package com.sparta.delivery.gemini.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.delivery.gemini.service.GeminiService;
 import com.sparta.delivery.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,9 @@ public class GeminiController {
   private final GeminiService geminiService;
 
   @PostMapping()
-  public String createGemini(@RequestBody String message, @AuthenticationPrincipal User user) {
+  public String createGemini(@RequestBody String message, @AuthenticationPrincipal User user) throws JsonProcessingException {
 
     return this.geminiService.sendJsonRequest(message, user);
   }
+
 }
