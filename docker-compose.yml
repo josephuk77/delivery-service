@@ -10,6 +10,11 @@ services:
     depends_on:
       - db
     container_name: delivery-backend
+    volumes:
+      - ./src/main/java:/delivery/src/main/java  # ✅ Java 소스 코드 동기화
+      - ./src/main/resources:/delivery/src/main/resources  # ✅ 설정 파일 동기화
+    working_dir: /delivery
+    command: ./gradlew bootRun --continuous  # ✅ JAR 빌드 없이 실행
 
   db:
     image: postgres
