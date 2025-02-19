@@ -27,7 +27,7 @@ public class AddressController {
   private final AddressService addressService;
 
   @PostMapping
-  public ResponseEntity createAddress(@AuthenticationPrincipal UserDetailsImpl userDetails,
+  public ResponseEntity<?> createAddress(@AuthenticationPrincipal UserDetailsImpl userDetails,
       @RequestBody AddressRequestDto requestDto) {
     addressService.createAddress(userDetails.getUser(), requestDto);
     return ResponseEntity.status(HttpStatus.CREATED).body("주소 등록이 완료되었습니다.");
