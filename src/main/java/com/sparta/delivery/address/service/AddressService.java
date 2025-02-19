@@ -28,7 +28,7 @@ public class AddressService {
   public AddressResponseDto getAddress(UUID addressID, User user) {
     Address address = findAddress(addressID);
     checkPermission(user, address);
-
+    checkDeletion(address);
     return new AddressResponseDto(address);
   }
 
@@ -42,8 +42,16 @@ public class AddressService {
   @Transactional
   public void updateAddress(UUID addressID, User user, AddressRequestDto requestDto) {
     Address address = findAddress(addressID);
+    checkDeletion(address);
     checkPermission(user, address);
     address.update(requestDto);
+  }
+
+  @Transactional
+  public void deleteAddress(UUID addressID, User user) {
+    Address address = findAddress(addressID);
+    checkPermission(user, address);
+    address.updateDelete(user.getId());
   }
 
   private Address findAddress(UUID addressID) {
@@ -57,6 +65,12 @@ public class AddressService {
     }
     if (!address.getUser().getId().equals(user.getId())) {
       throw new GlobalException(HttpStatus.FORBIDDEN, "해당 주소에 접근할 수 없습니다.");
+    }
+  }
+
+  private void checkDeletion(Address address) {
+    if (address.getDeletedAt() != null) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "삭제된 주소입니다.");
     }
   }
 }

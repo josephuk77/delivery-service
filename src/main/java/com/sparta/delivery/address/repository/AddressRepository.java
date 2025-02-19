@@ -5,8 +5,10 @@ import com.sparta.delivery.user.entity.User;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface AddressRepository extends JpaRepository<Address, UUID> {
 
+  @Query("SELECT a FROM Address a WHERE a.user = :user AND a.deletedAt IS NOT NULL")
   List<Address> findAllByUser(User user);
 }
