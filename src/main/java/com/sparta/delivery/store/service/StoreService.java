@@ -1,6 +1,7 @@
 package com.sparta.delivery.store.service;
 
 import com.sparta.delivery.aaglobal.GlobalException;
+import com.sparta.delivery.food.dto.FoodWithStoreResponseDto;
 import com.sparta.delivery.food.entity.Food;
 import com.sparta.delivery.food.repository.FoodRepository;
 import com.sparta.delivery.review.repository.ReviewRepository;
@@ -15,6 +16,7 @@ import com.sparta.delivery.user.repository.UserRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,13 +31,19 @@ public class StoreService {
   private final FoodRepository foodRepository;
   private final ReviewRepository reviewRepository;
 
-  // 특정 음식점 조회
+  // 음식점 상세 조회
   @Transactional(readOnly = true)
   public StoreDetailResponseDto getStore(UUID storeId) {
     Store store = storeRepository.findById(storeId)
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 가게입니다."));
 
     List<Food> foods = foodRepository.findAllByStoreId(storeId);
+
+    List<FoodWithStoreResponseDto> foodDtos =
+        foods.stream()
+            .map(food -> new FoodWithStoreResponseDto(food.getId(), food.getName(),
+                food.getContent(), food.getPrice()))
+            .collect(Collectors.toList());
 
     // 리뷰 수 계산
     Integer reviewCount = reviewRepository.countByStoreId(storeId);
@@ -51,7 +59,7 @@ public class StoreService {
         store.getPhone(),
         ratingAvg,
         reviewCount,
-        foods
+        foodDtos
     );
   }
 
