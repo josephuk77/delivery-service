@@ -18,6 +18,10 @@ import com.sparta.delivery.user.entity.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -68,12 +72,17 @@ public class GeminiService {
         return gemini.getAnswer();
     }
 
-    public List<GeminiResponseDto> getGeminiList(UserDetailsImpl userDetails) {
-        if (userDetails.getUser().getRole().equals(UserRoleEnum.CUSTOMER)) {
-            throw new GlobalException(HttpStatus.FORBIDDEN, "사용 권한이 없습니다. ");
-        }
+    public Page<GeminiResponseDto> getGeminiList(UserDetailsImpl userDetails, int page, int size) {
+        // CUSTOMER 이면 Exception
+        rollCheckIfCustomer(userDetails);
 
-        return this.geminiRepository.findByUserId(userDetails.getUser().getId()).stream().filter(gemini -> gemini.getDeletedAt() == null).map(GeminiResponseDto::new).toList();
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<GeminiResponseDto> list = this.geminiRepository.findByUserIdOrderByCreatedAtDesc(userDetails.getUser().getId(), pageable)
+                .stream().map(GeminiResponseDto::new).toList();
+        Page<GeminiResponseDto> dtoPage = new PageImpl<>(list, pageable, list.size());
+
+        return dtoPage;
     }
 
     public String deleteGemini(UUID aiId, UserDetailsImpl userDetails) {

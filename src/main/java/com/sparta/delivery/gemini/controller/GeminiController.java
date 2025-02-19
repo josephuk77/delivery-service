@@ -6,6 +6,7 @@ import com.sparta.delivery.gemini.service.GeminiService;
 import com.sparta.delivery.jwt.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +33,11 @@ public class GeminiController {
     }
 
     @GetMapping("/list")
-    public List<GeminiResponseDto> getGeminiList(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public Page<GeminiResponseDto> getGeminiList(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                 @RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "10") int size) {
 
-        return this.geminiService.getGeminiList(userDetails);
+        return this.geminiService.getGeminiList(userDetails, page, size);
     }
 
     @DeleteMapping("/{aiId}")
