@@ -108,7 +108,6 @@ public class StoreService {
 
     checkUserRole(user);
 
-    // 가게 생성
     Store store = storeRepository.save(new Store(requestDto, user));
     return new StoreResponseDto(store);
   }
