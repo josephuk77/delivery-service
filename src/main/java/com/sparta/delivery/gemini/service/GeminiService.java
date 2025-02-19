@@ -38,9 +38,7 @@ public class GeminiService {
     public String sendJsonRequest(String question, UserDetailsImpl userDetails) throws JsonProcessingException {
 
         // CUSTOMER 이면 권한이 옳지 않아 Exception
-        if (userDetails.getRole().equals(UserRoleEnum.CUSTOMER)) {
-            throw new GlobalException(HttpStatus.FORBIDDEN, "사용 권한이 없습니다. ");
-        }
+        rollCheckIfCustomer(userDetails);
 
         // JSON 데이터 생성
         Map<String, Object> requestBody = createMapObject(question);
@@ -58,13 +56,10 @@ public class GeminiService {
         return answer;
     }
 
-
     public String getGemini(UUID aiId, UserDetailsImpl userDetails) {
 
         // CUSTOMER 이면 Exception
-        if (userDetails.getUser().getRole().equals(UserRoleEnum.CUSTOMER)) {
-            throw new GlobalException(HttpStatus.FORBIDDEN, "사용 권한이 없습니다. ");
-        }
+        rollCheckIfCustomer(userDetails);
 
         Gemini gemini = this.geminiRepository.findById(aiId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 아이디 입니다, "));
         if (gemini.getDeletedAt() != null) {
@@ -82,10 +77,7 @@ public class GeminiService {
     }
 
     public String deleteGemini(UUID aiId, UserDetailsImpl userDetails) {
-
-        if (userDetails.getUser().getRole().equals(UserRoleEnum.CUSTOMER)) {
-            throw new GlobalException(HttpStatus.FORBIDDEN, "사용 권한이 없습니다. ");
-        }
+        rollCheckIfCustomer(userDetails);
 
         Gemini gemini = this.geminiRepository.findById(aiId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 내역입니다. "));
         gemini.updateDelete(userDetails.getUser().getId());
@@ -130,4 +122,9 @@ public class GeminiService {
         }
     }
 
+    private void rollCheckIfCustomer(UserDetailsImpl userDetails) {
+        if (userDetails.getRole().equals(UserRoleEnum.CUSTOMER)) {
+            throw new GlobalException(HttpStatus.FORBIDDEN, "사용 권한이 없습니다. ");
+        }
+    }
 }
