@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface AddressRepository extends JpaRepository<Address, UUID> {
 
-  @Query("SELECT a FROM Address a WHERE a.user = :user AND a.deletedAt IS NOT NULL")
+  @Query("SELECT a FROM Address a WHERE a.user = :user AND a.deletedAt IS NULL")
   List<Address> findAllByUser(User user);
 }
