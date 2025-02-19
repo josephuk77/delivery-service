@@ -34,7 +34,8 @@ public class AddressController {
   }
 
   @GetMapping("/{addressID}")
-  public ResponseEntity<AddressResponseDto> getAddress(@PathVariable UUID addressID,
+  public ResponseEntity<AddressResponseDto> getAddress(
+      @PathVariable UUID addressID,
       @AuthenticationPrincipal UserDetailsImpl userDetails) {
     AddressResponseDto responseDto = addressService.getAddress(addressID, userDetails.getUser());
     return ResponseEntity.ok().body(responseDto);
@@ -56,11 +57,19 @@ public class AddressController {
     return ResponseEntity.status(HttpStatus.OK).body("주소 수정이 완료되었습니다.");
   }
 
+  @PatchMapping("/{addressID}/current")
+  public ResponseEntity<?> updateCurrentAddress(
+      @PathVariable UUID addressID,
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    addressService.updateCurrentAddress(addressID, userDetails.getUser());
+    return ResponseEntity.status(HttpStatus.OK).body("해당 주소가 현재 주소로 설정되었습니다.");
+  }
+
   @DeleteMapping("/{addressID}")
   public ResponseEntity<?> deleteAddress(
       @PathVariable UUID addressID,
       @AuthenticationPrincipal UserDetailsImpl userDetails) {
     addressService.deleteAddress(addressID, userDetails.getUser());
-    return ResponseEntity.status(HttpStatus.OK).body("주소 삭제가 완료되었습니다.");
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body("주소 삭제가 완료되었습니다.");
   }
 }
