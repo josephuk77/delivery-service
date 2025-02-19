@@ -37,7 +37,7 @@ public class StoreController {
     return ResponseEntity.status(HttpStatus.OK).body(responseDto);
   }
 
-  @GetMapping("/{keyword}")
+  @GetMapping("/search/{keyword}")
   public ResponseEntity<Page<StoreSearchResponseDto>> getStoresByKeyword(
       @PathVariable String keyword,
       @RequestParam(value = "page", defaultValue = "0") int page,
@@ -50,7 +50,7 @@ public class StoreController {
     return ResponseEntity.status(HttpStatus.OK).body(stores);
   }
 
-  @GetMapping("/categories")
+  @GetMapping("/search/categories")
   public ResponseEntity<Page<StoreSearchResponseDto>> getStoresByCategory(
       @RequestParam String category,
       @RequestParam(value = "page", defaultValue = "0") int page,
