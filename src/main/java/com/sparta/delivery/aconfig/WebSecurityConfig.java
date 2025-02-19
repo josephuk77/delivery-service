@@ -1,9 +1,11 @@
 package com.sparta.delivery.aconfig;
 
+import com.sparta.delivery.jwt.JwtAccessDeniedHandler;
+import com.sparta.delivery.jwt.JwtAuthenticationEntryPoint;
 import com.sparta.delivery.jwt.JwtAuthenticationFilter;
 import com.sparta.delivery.jwt.JwtAuthorizationFilter;
+import com.sparta.delivery.jwt.JwtExceptionFilter;
 import com.sparta.delivery.jwt.JwtUtil;
-import com.sparta.delivery.user.service.UserDetailsServiceImpl;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -29,8 +31,12 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 public class WebSecurityConfig {
 
   private final JwtUtil jwtUtil;
-  private final UserDetailsServiceImpl userDetailsService;
   private final AuthenticationConfiguration authenticationConfiguration;
+
+  private final JwtExceptionFilter jwtExceptionFilter;
+  private final JwtAuthorizationFilter jwtAuthorizationFilter;
+  private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+  private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
   private static final String GET = HttpMethod.GET.name();
   private static final String POST = HttpMethod.POST.name();
@@ -48,14 +54,10 @@ public class WebSecurityConfig {
 
   @Bean
   public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-    JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil);
+    JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil,
+        jwtAuthenticationEntryPoint);
     filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
     return filter;
-  }
-
-  @Bean
-  public JwtAuthorizationFilter jwtAuthorizationFilter() {
-    return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
   }
 
   @Bean
@@ -72,9 +74,13 @@ public class WebSecurityConfig {
             .requestMatchers(publicEndPoints()).permitAll()
             .anyRequest().authenticated()
     );
-
-    http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
+    http.addFilterBefore(jwtExceptionFilter, UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(jwtAuthorizationFilter, JwtAuthenticationFilter.class);
     http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+    http.exceptionHandling((exceptionHandling) -> exceptionHandling
+        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+        .accessDeniedHandler(jwtAccessDeniedHandler));
 
     return http.build();
   }
@@ -82,8 +88,7 @@ public class WebSecurityConfig {
   private RequestMatcher publicEndPoints() {
     List<RequestMatcher> matchers = List.of(
         // 회원가입, 로그인
-        new AntPathRequestMatcher("/users/signup", POST),
-        new AntPathRequestMatcher("/users/admin/signup", POST),
+        new AntPathRequestMatcher("/users/signup/**", POST),
         new AntPathRequestMatcher("/users/login", POST),
 
         // 조회, 검색
