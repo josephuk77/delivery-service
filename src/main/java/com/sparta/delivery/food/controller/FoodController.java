@@ -57,6 +57,14 @@ public class FoodController {
     return this.foodService.listFood(keyword, page, size);
   }
 
+  @GetMapping("/store/{storeId}")
+  public Page<FoodResponseDto> getFoodsByStoreId(@PathVariable UUID storeId,
+                                                 @RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "10") int size){
+
+    return this.foodService.getFoodsByStoreId(storeId, page, size);
+  }
+
   @PatchMapping("/{foodId}")
   public String visibleFood(@PathVariable UUID foodId,
                             @RequestParam(required = false) boolean isVisible,
@@ -64,5 +72,4 @@ public class FoodController {
 
     return this.foodService.visibleFood(foodId, isVisible, userDetails);
   }
-
 }

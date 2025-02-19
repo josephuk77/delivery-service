@@ -125,4 +125,12 @@ public class FoodService {
 
         return isVisible ? "숨김처리 해제 되었습니다. " : "숨김처리 되었습니다. ";
     }
+
+
+    public Page<FoodResponseDto> getFoodsByStoreId(UUID storeId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Food> foodPage = this.foodRepository.findByStoreId(storeId, pageable);
+        List<FoodResponseDto> dtoList = foodPage.stream().map(FoodResponseDto::new).toList();
+        return new PageImpl<>(dtoList, pageable, dtoList.size());
+    }
 }
