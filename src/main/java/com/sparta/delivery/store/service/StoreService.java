@@ -121,6 +121,8 @@ public class StoreService {
 
     Store store = findStore(storeId);
 
+    validateStoreOwner(user, store);
+
     store.update(requestDto);
     storeRepository.save(store);
 
@@ -134,6 +136,8 @@ public class StoreService {
     checkUserRole(user);
 
     Store store = findStore(storeId);
+
+    validateStoreOwner(user, store);
 
     store.updateDelete(user.getId());
     storeRepository.save(store);
@@ -154,5 +158,11 @@ public class StoreService {
   private Store findStore(UUID storeId) {
     return storeRepository.findById(storeId)
         .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 가게입니다."));
+  }
+
+  private static void validateStoreOwner(User user, Store store) {
+    if (user.getRole().equals(UserRoleEnum.OWNER) && !store.getUser().equals(user)) {
+      throw new GlobalException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+    }
   }
 }
