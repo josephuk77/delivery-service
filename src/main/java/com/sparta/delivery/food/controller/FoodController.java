@@ -2,9 +2,7 @@ package com.sparta.delivery.food.controller;
 
 import com.sparta.delivery.food.dto.FoodRequestDto;
 import com.sparta.delivery.food.dto.FoodResponseDto;
-import com.sparta.delivery.food.entity.Food;
 import com.sparta.delivery.food.service.FoodService;
-import java.util.List;
 import java.util.UUID;
 
 import com.sparta.delivery.jwt.UserDetailsImpl;

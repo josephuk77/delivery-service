@@ -103,13 +103,8 @@ public class FoodService {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        List<Food> foodList = this.foodRepository.findByNameOrderByCreatedAtDesc(keyword, pageable).stream()
-                .filter(Food::isVisible)
-                .filter(food -> food.getDeletedAt() == null)
-                .toList();
-
+        List<Food> foodList = this.foodRepository.findByName(keyword, pageable).stream().toList();
         List<FoodResponseDto> dtoList = foodList.stream().map(FoodResponseDto::new).toList();
-
         return new PageImpl<>(dtoList, pageable, dtoList.size());
     }
 

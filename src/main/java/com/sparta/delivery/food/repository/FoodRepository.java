@@ -11,8 +11,9 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface FoodRepository extends JpaRepository<Food, UUID> {
 
-  Page<Food> findByNameOrderByCreatedAtDesc(String foodName, Pageable pageable);
+  @Query("SELECT f FROM Food f WHERE f.name = :foodName AND f.deletedAt IS NULL AND f.isVisible = true ORDER BY f.createdAt DESC")
+  Page<Food> findByName(String foodName, Pageable pageable);
 
-  @Query("SELECT f From Food f WHERE f.deletedAt IS NULL AND f.isVisible = true")
+  @Query("SELECT f FROM Food f WHERE f.store.id = :storeId AND f.deletedAt IS NULL AND f.isVisible = true ORDER BY f.createdAt DESC")
   Page<Food> findByStoreId(UUID storeId, Pageable pageable);
 }
