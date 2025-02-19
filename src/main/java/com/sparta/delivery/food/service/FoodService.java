@@ -15,6 +15,10 @@ import java.util.UUID;
 import com.sparta.delivery.user.entity.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -95,14 +99,18 @@ public class FoodService {
         return "삭제 완료";
     }
 
-    public List<FoodResponseDto> listFood(String keyword) {
+    public Page<FoodResponseDto> listFood(String keyword, int page, int size) {
 
-        List<Food> foodList = this.foodRepository.findByName(keyword).stream()
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<Food> foodList = this.foodRepository.findByNameOrderByCreatedAtDesc(keyword, pageable).stream()
                 .filter(Food::isVisible)
                 .filter(food -> food.getDeletedAt() == null)
                 .toList();
 
-        return foodList.stream().map(FoodResponseDto::new).toList();
+        List<FoodResponseDto> dtoList = foodList.stream().map(FoodResponseDto::new).toList();
+
+        return new PageImpl<>(dtoList, pageable, dtoList.size());
     }
 
     public String visibleFood(UUID foodId, boolean isVisible, UserDetailsImpl userDetails) {
