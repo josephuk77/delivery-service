@@ -70,10 +70,10 @@ public class JwtUtil {
     try {
       Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     } catch (SecurityException | MalformedJwtException | SignatureException e) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST,
+      throw new GlobalException(HttpStatus.UNAUTHORIZED,
           "Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
     } catch (ExpiredJwtException e) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST,
+      throw new GlobalException(HttpStatus.UNAUTHORIZED,
           "Expired JWT token, 만료된 JWT token 입니다.");
     } catch (UnsupportedJwtException e) {
       throw new GlobalException(HttpStatus.BAD_REQUEST,

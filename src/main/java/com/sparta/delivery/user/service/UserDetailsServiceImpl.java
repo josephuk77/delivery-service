@@ -23,6 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     if (user.getDeletedAt() != null) {
       throw new DisabledException("탈퇴한 사용자입니다.");
+//      throw new GlobalException(HttpStatus.BAD_REQUEST, "탈퇴한 사용자입니다.");
     }
 
     return new UserDetailsImpl(user);
