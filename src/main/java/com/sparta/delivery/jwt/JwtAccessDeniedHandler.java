@@ -1,6 +1,5 @@
 package com.sparta.delivery.jwt;
 
-import com.sparta.delivery.aaglobal.GlobalException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,21 +19,11 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
   public void handle(HttpServletRequest request, HttpServletResponse response,
       AccessDeniedException accessDeniedException) throws IOException, ServletException {
 
-    Throwable cause = accessDeniedException.getCause();
+    String errorMessage = accessDeniedException.getMessage();
+    log.error("Forbidden error: {}", errorMessage);
+
     response.setStatus(HttpStatus.FORBIDDEN.value());
     response.setCharacterEncoding("UTF-8");
-
-    // AccessDeniedException의 원인이 GlobalException인 경우
-    if (cause instanceof GlobalException) {
-      GlobalException globalEx = (GlobalException) cause;
-      log.error("Global Exception: {}, message: {}",
-          globalEx.getStatus(), globalEx.getMessage());
-      response.getWriter().write(globalEx.getMessage());
-      response.getWriter().flush();
-    } else {  // 기본 인가 실패 처리
-      log.error("Forbidden error: {}", accessDeniedException.getMessage());
-      response.getWriter().write(accessDeniedException.getMessage());
-      response.getWriter().flush();
-    }
+    response.getWriter().write(errorMessage);
   }
 }

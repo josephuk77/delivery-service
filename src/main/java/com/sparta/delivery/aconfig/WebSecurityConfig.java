@@ -74,7 +74,7 @@ public class WebSecurityConfig {
             .requestMatchers(publicEndPoints()).permitAll()
             .anyRequest().authenticated()
     );
-//    http.addFilterBefore(jwtExceptionFilter, UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(jwtExceptionFilter, UsernamePasswordAuthenticationFilter.class);
     http.addFilterBefore(jwtAuthorizationFilter, JwtAuthenticationFilter.class);
     http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
