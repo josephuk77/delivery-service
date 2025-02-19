@@ -42,7 +42,7 @@ public class GeminiService {
     public String sendJsonRequest(String question, UserDetailsImpl userDetails) throws JsonProcessingException {
 
         // CUSTOMER 이면 권한이 옳지 않아 Exception
-        rollCheckIfCustomer(userDetails);
+        roleCheckIfCustomer(userDetails);
 
         // JSON 데이터 생성
         Map<String, Object> requestBody = createMapObject(question);
@@ -63,7 +63,7 @@ public class GeminiService {
     public String getGemini(UUID aiId, UserDetailsImpl userDetails) {
 
         // CUSTOMER 이면 Exception
-        rollCheckIfCustomer(userDetails);
+        roleCheckIfCustomer(userDetails);
 
         Gemini gemini = this.geminiRepository.findById(aiId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 아이디 입니다, "));
         if (gemini.getDeletedAt() != null) {
@@ -74,7 +74,7 @@ public class GeminiService {
 
     public Page<GeminiResponseDto> getGeminiList(UserDetailsImpl userDetails, int page, int size) {
         // CUSTOMER 이면 Exception
-        rollCheckIfCustomer(userDetails);
+        roleCheckIfCustomer(userDetails);
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -86,7 +86,7 @@ public class GeminiService {
     }
 
     public String deleteGemini(UUID aiId, UserDetailsImpl userDetails) {
-        rollCheckIfCustomer(userDetails);
+        roleCheckIfCustomer(userDetails);
 
         Gemini gemini = this.geminiRepository.findById(aiId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 내역입니다. "));
         gemini.updateDelete(userDetails.getUser().getId());
@@ -131,7 +131,7 @@ public class GeminiService {
         }
     }
 
-    private void rollCheckIfCustomer(UserDetailsImpl userDetails) {
+    private void roleCheckIfCustomer(UserDetailsImpl userDetails) {
         if (userDetails.getRole().equals(UserRoleEnum.CUSTOMER)) {
             throw new GlobalException(HttpStatus.FORBIDDEN, "사용 권한이 없습니다. ");
         }
