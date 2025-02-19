@@ -42,4 +42,9 @@ public class Address extends Timestamped {
     this.name = requestDto.getName();
     this.address = requestDto.getAddress();
   }
+
+  public void update(AddressRequestDto requestDto) {
+    this.name = requestDto.getName();
+    this.address = requestDto.getAddress();
+  }
 }

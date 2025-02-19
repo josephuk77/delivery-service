@@ -7,6 +7,7 @@ import com.sparta.delivery.address.entity.Address;
 import com.sparta.delivery.address.repository.AddressRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,13 @@ public class AddressService {
     return addressList.stream()
         .map(AddressResponseDto::new)
         .toList();
+  }
+
+  @Transactional
+  public void updateAddress(UUID addressID, User user, AddressRequestDto requestDto) {
+    Address address = findAddress(addressID);
+    checkPermission(user, address);
+    address.update(requestDto);
   }
 
   private Address findAddress(UUID addressID) {

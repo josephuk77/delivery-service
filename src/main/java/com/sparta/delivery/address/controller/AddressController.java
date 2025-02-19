@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,5 +44,14 @@ public class AddressController {
       @AuthenticationPrincipal UserDetailsImpl userDetails) {
     List<AddressResponseDto> responseDto = addressService.getAllAddress(userDetails.getUser());
     return ResponseEntity.ok().body(responseDto);
+  }
+
+  @PatchMapping("/{addressID}")
+  public ResponseEntity<?> updateAddress(
+      @PathVariable UUID addressID,
+      @AuthenticationPrincipal UserDetailsImpl userDetails,
+      @RequestBody AddressRequestDto requestDto) {
+    addressService.updateAddress(addressID, userDetails.getUser(), requestDto);
+    return ResponseEntity.status(HttpStatus.OK).body("주소 수정이 완료되었습니다.");
   }
 }
