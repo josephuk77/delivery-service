@@ -31,7 +31,7 @@ public class FoodService {
     private final StoreRepository storeRepository;
 
     public String addFood(FoodRequestDto requestDto, UserDetailsImpl userDetails) {
-        rollCheckIfCustomer(userDetails);
+        roleCheckIfCustomer(userDetails);
 
         Food food = new Food(requestDto);
         UUID storeId = requestDto.getStoreId();
@@ -64,7 +64,7 @@ public class FoodService {
 
 
     public String updateFood(UUID foodId, FoodRequestDto requestDto, UserDetailsImpl userDetails) {
-        rollCheckIfCustomer(userDetails);
+        roleCheckIfCustomer(userDetails);
 
         Food food = this.foodRepository.findById(foodId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 음식 id 입니다."));
 
@@ -83,7 +83,7 @@ public class FoodService {
     }
 
     public String deleteFood(UUID foodId, UserDetailsImpl userDetails) {
-        rollCheckIfCustomer(userDetails);
+        roleCheckIfCustomer(userDetails);
 
         Food food = this.foodRepository.findById(foodId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "해당하는 음식이 없습니다. "));
         food.updateDelete(userDetails.getUser().getId());
@@ -101,7 +101,7 @@ public class FoodService {
     }
 
     public String visibleFood(UUID foodId, boolean isVisible, UserDetailsImpl userDetails) {
-        rollCheckIfCustomer(userDetails);
+        roleCheckIfCustomer(userDetails);
 
         Food food = this.foodRepository.findById(foodId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 음식 입니다. "));
 
@@ -112,14 +112,7 @@ public class FoodService {
     }
 
 
-    public Page<FoodResponseDto> getFoodsByStoreId(UUID storeId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Food> foodPage = this.foodRepository.findByStoreId(storeId, pageable);
-        List<FoodResponseDto> dtoList = foodPage.stream().map(FoodResponseDto::new).toList();
-        return new PageImpl<>(dtoList, pageable, dtoList.size());
-    }
-
-    public void rollCheckIfCustomer(UserDetailsImpl userDetails) {
+    public void roleCheckIfCustomer(UserDetailsImpl userDetails) {
         if (userDetails.getUser().getRole().equals(UserRoleEnum.CUSTOMER)) {
             throw new GlobalException(HttpStatus.FORBIDDEN, "해당 권한을 가지고 있지 않습니다. ");
         }

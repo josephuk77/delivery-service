@@ -3,6 +3,7 @@ package com.sparta.delivery.food.controller;
 import com.sparta.delivery.food.dto.FoodRequestDto;
 import com.sparta.delivery.food.dto.FoodResponseDto;
 import com.sparta.delivery.food.service.FoodService;
+
 import java.util.UUID;
 
 import com.sparta.delivery.jwt.UserDetailsImpl;
@@ -20,54 +21,46 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class FoodController {
 
-  private final FoodService foodService;
+    private final FoodService foodService;
 
-  @PostMapping()
-  public String addFood(@RequestBody FoodRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    @PostMapping()
+    public String addFood(@RequestBody FoodRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-    return this.foodService.addFood(requestDto, userDetails);
-  }
+        return this.foodService.addFood(requestDto, userDetails);
+    }
 
-  @GetMapping(value = "/{foodId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<FoodResponseDto> getFood(@PathVariable UUID foodId) {
+    @GetMapping(value = "/{foodId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<FoodResponseDto> getFood(@PathVariable UUID foodId) {
 
-    return ResponseEntity.ok(this.foodService.getFood(foodId));
-  }
+        return ResponseEntity.ok(this.foodService.getFood(foodId));
+    }
 
-  @PutMapping("/{foodId}")
-  public String updateFood(@PathVariable UUID foodId, @RequestBody FoodRequestDto requestDto,
-                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    @PutMapping("/{foodId}")
+    public String updateFood(@PathVariable UUID foodId, @RequestBody FoodRequestDto requestDto,
+                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-    return this.foodService.updateFood(foodId, requestDto, userDetails);
-  }
+        return this.foodService.updateFood(foodId, requestDto, userDetails);
+    }
 
-  @DeleteMapping("/{foodId}")
-  public String deleteFood(@PathVariable UUID foodId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    @DeleteMapping("/{foodId}")
+    public String deleteFood(@PathVariable UUID foodId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-    return this.foodService.deleteFood(foodId, userDetails);
-  }
+        return this.foodService.deleteFood(foodId, userDetails);
+    }
 
-  @GetMapping("/list/{keyword}")
-  public Page<FoodResponseDto> listFood(@PathVariable String keyword,
-                                        @RequestParam(defaultValue = "0") int page,
-                                        @RequestParam(defaultValue = "10") int size) {
+    @GetMapping("/list/{keyword}")
+    public Page<FoodResponseDto> listFood(@PathVariable String keyword,
+                                          @RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size) {
 
-    return this.foodService.listFood(keyword, page, size);
-  }
+        return this.foodService.listFood(keyword, page, size);
+    }
 
-  @GetMapping("/store/{storeId}")
-  public Page<FoodResponseDto> getFoodsByStoreId(@PathVariable UUID storeId,
-                                                 @RequestParam(defaultValue = "0") int page,
-                                                 @RequestParam(defaultValue = "10") int size){
+    @PatchMapping("/{foodId}")
+    public String visibleFood(@PathVariable UUID foodId,
+                              @RequestParam(required = false) boolean isVisible,
+                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-    return this.foodService.getFoodsByStoreId(storeId, page, size);
-  }
-
-  @PatchMapping("/{foodId}")
-  public String visibleFood(@PathVariable UUID foodId,
-                            @RequestParam(required = false) boolean isVisible,
-                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
-    return this.foodService.visibleFood(foodId, isVisible, userDetails);
-  }
+        return this.foodService.visibleFood(foodId, isVisible, userDetails);
+    }
 }
