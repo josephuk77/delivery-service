@@ -40,12 +40,15 @@ public class Food extends Timestamped {
   @JoinColumn(name = "store_id")
   private Store store;
 
+  @Column(name = "is_visible", nullable = false)
+  private boolean isVisible;
 
   public Food(FoodRequestDto foodRequestDto) {
 
     this.name = foodRequestDto.getFoodName();
     this.content = foodRequestDto.getContent();
     this.price = foodRequestDto.getPrice();
+    this.isVisible = true;
 
   }
 
@@ -58,5 +61,9 @@ public class Food extends Timestamped {
 
   public void updateStore(Store store) {
     this.store = store;
+  }
+
+  public void updateVisible(boolean isVisible) {
+    this.isVisible = isVisible;
   }
 }
