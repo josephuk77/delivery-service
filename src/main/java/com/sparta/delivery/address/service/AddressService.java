@@ -7,6 +7,7 @@ import com.sparta.delivery.address.entity.Address;
 import com.sparta.delivery.address.repository.AddressRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,13 @@ public class AddressService {
     checkPermission(user, address);
 
     return new AddressResponseDto(address);
+  }
+
+  public List<AddressResponseDto> getAllAddress(User user) {
+    List<Address> addressList = addressRepository.findAllByUser(user);
+    return addressList.stream()
+        .map(AddressResponseDto::new)
+        .toList();
   }
 
   private Address findAddress(UUID addressID) {

@@ -4,6 +4,7 @@ import com.sparta.delivery.address.dto.AddressRequestDto;
 import com.sparta.delivery.address.dto.AddressResponseDto;
 import com.sparta.delivery.address.service.AddressService;
 import com.sparta.delivery.jwt.UserDetailsImpl;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,13 @@ public class AddressController {
   public ResponseEntity<AddressResponseDto> getAddress(@PathVariable UUID addressID,
       @AuthenticationPrincipal UserDetailsImpl userDetails) {
     AddressResponseDto responseDto = addressService.getAddress(addressID, userDetails.getUser());
+    return ResponseEntity.ok().body(responseDto);
+  }
+
+  @GetMapping()
+  public ResponseEntity<List<AddressResponseDto>> getAllAddress(
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    List<AddressResponseDto> responseDto = addressService.getAllAddress(userDetails.getUser());
     return ResponseEntity.ok().body(responseDto);
   }
 }
