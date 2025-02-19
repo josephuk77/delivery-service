@@ -10,15 +10,18 @@ import com.sparta.delivery.gemini.repository.GeminiRepository;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 import com.sparta.delivery.jwt.UserDetailsImpl;
 import com.sparta.delivery.user.entity.User;
-import com.sparta.delivery.user.repository.UserRepository;
+import com.sparta.delivery.user.entity.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -32,12 +35,14 @@ public class GeminiService {
     private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱을 위한 ObjectMapper
     private final WebClient webClient;
     private final GeminiRepository geminiRepository;
-    private final UserRepository userRepository;
 
     @Value("${gemini.secret.key}")
     private String secretKey;
 
     public String sendJsonRequest(String question, UserDetailsImpl userDetails) throws JsonProcessingException {
+
+        // CUSTOMER 이면 권한이 옳지 않아 Exception
+        roleCheckIfCustomer(userDetails);
 
         // JSON 데이터 생성
         Map<String, Object> requestBody = createMapObject(question);
@@ -55,8 +60,11 @@ public class GeminiService {
         return answer;
     }
 
+    public String getGemini(UUID aiId, UserDetailsImpl userDetails) {
 
-    public String getGemini(UUID aiId) {
+        // CUSTOMER 이면 Exception
+        roleCheckIfCustomer(userDetails);
+
         Gemini gemini = this.geminiRepository.findById(aiId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 아이디 입니다, "));
         if (gemini.getDeletedAt() != null) {
             throw new GlobalException(HttpStatus.NOT_ACCEPTABLE, "삭제된 메세지 입니다. ");
@@ -64,15 +72,24 @@ public class GeminiService {
         return gemini.getAnswer();
     }
 
-    public List<GeminiResponseDto> getGeminiList(User user) {
-        log.info("getGeminiList : {}", user.toString());
-        return this.geminiRepository.findByUserId(user.getId()).stream().filter(gemini -> gemini.getDeletedAt() == null).map(GeminiResponseDto::new).toList();
+    public Page<GeminiResponseDto> getGeminiList(UserDetailsImpl userDetails, int page, int size) {
+        // CUSTOMER 이면 Exception
+        roleCheckIfCustomer(userDetails);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<GeminiResponseDto> list = this.geminiRepository.findByUserIdOrderByCreatedAtDesc(userDetails.getUser().getId(), pageable)
+                .stream().map(GeminiResponseDto::new).toList();
+        Page<GeminiResponseDto> dtoPage = new PageImpl<>(list, pageable, list.size());
+
+        return dtoPage;
     }
 
-    public String deleteGemini(UUID aiId, User user) {
+    public String deleteGemini(UUID aiId, UserDetailsImpl userDetails) {
+        roleCheckIfCustomer(userDetails);
 
         Gemini gemini = this.geminiRepository.findById(aiId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 내역입니다. "));
-        gemini.updateDelete(user.getId());
+        gemini.updateDelete(userDetails.getUser().getId());
         this.geminiRepository.save(gemini);
 
         return "해당 내용이 삭제되었습니다. ";
@@ -114,4 +131,9 @@ public class GeminiService {
         }
     }
 
+    private void roleCheckIfCustomer(UserDetailsImpl userDetails) {
+        if (userDetails.getRole().equals(UserRoleEnum.CUSTOMER)) {
+            throw new GlobalException(HttpStatus.FORBIDDEN, "사용 권한이 없습니다. ");
+        }
+    }
 }
