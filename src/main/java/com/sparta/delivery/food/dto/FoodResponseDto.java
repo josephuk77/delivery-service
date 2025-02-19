@@ -14,6 +14,7 @@ public class FoodResponseDto {
   private String name;
   private String content;
   private Integer price;
+  private Boolean isVisible;
 
   public FoodResponseDto(Food food) {
     this.foodId = food.getId();
@@ -23,5 +24,6 @@ public class FoodResponseDto {
     this.name = food.getName();
     this.content = food.getContent();
     this.price = food.getPrice();
+    this.isVisible = food.isVisible();
   }
 }

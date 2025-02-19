@@ -49,7 +49,7 @@ public class FoodController {
   }
 
   @GetMapping("/list/{keyword}")
-  public List<Food> listFood(@PathVariable String keyword) {
+  public List<FoodResponseDto> listFood(@PathVariable String keyword) {
 
     return this.foodService.listFood(keyword);
   }

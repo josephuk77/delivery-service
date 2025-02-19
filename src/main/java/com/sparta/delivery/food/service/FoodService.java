@@ -50,11 +50,11 @@ public class FoodService {
         Food food = this.foodRepository.findById(foodId).orElseThrow(() ->
                 new GlobalException(HttpStatus.NO_CONTENT, "해당하는 음식이 존재하지 않습니다. "));
 
-        if(!food.isVisible()){
+        if (!food.isVisible()) {
             throw new GlobalException(HttpStatus.FORBIDDEN, "숨김 처리된 음식 입니다. ");
         }
 
-        if(food.getDeletedAt() != null){
+        if (food.getDeletedAt() != null) {
             throw new GlobalException(HttpStatus.FORBIDDEN, "삭제된 음식 입니다. ");
         }
 
@@ -95,12 +95,14 @@ public class FoodService {
         return "삭제 완료";
     }
 
-    public List<Food> listFood(String keyword) {
+    public List<FoodResponseDto> listFood(String keyword) {
 
-        return this.foodRepository.findByName(keyword).stream()
+        List<Food> foodList = this.foodRepository.findByName(keyword).stream()
                 .filter(Food::isVisible)
                 .filter(food -> food.getDeletedAt() == null)
                 .toList();
+
+        return foodList.stream().map(FoodResponseDto::new).toList();
     }
 
     public String visibleFood(UUID foodId, boolean isVisible, UserDetailsImpl userDetails) {
