@@ -24,13 +24,10 @@ public class ReviewService {
 
   @Transactional
   public ReviewResponseDto createReview(ReviewRequestDto requestDto, User user) {
-    // CUSTOMER 인지 검증
     validateCustomer(user);
 
-    // 주문을 했는지 검증
     Order order = getOrder(requestDto);
 
-    // 주문한 사용자인지 검증
     validateOrderUser(user, order);
 
     Review review = reviewRepository.save(new Review(requestDto, user));
