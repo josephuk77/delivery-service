@@ -20,6 +20,11 @@ spring:
     init:
       mode: always
 
+  data:
+    redis:
+      host: delivery-redis
+      port: 6379
+
 server:
   port: 8080
 

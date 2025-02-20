@@ -28,6 +28,15 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:latest
+    container_name: delivery-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes", "--bind", "0.0.0.0"]  # ✅ 외부 접근 허용
+
 
   pgadmin:
     image: dpage/pgadmin4
@@ -40,3 +49,4 @@ services:
 
 volumes:
   db_data:
+  redis_data:  # ✅ Redis 볼륨 추가
