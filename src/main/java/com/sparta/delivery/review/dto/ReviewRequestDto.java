@@ -1,5 +1,7 @@
 package com.sparta.delivery.review.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
@@ -16,6 +18,7 @@ public class ReviewRequestDto {
   private UUID orderId;
 
   @NotBlank
+  @Min(1) @Max(5)
   private Integer star;
 
   @NotBlank
