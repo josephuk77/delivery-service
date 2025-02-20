@@ -18,10 +18,11 @@ public class ReviewRequestDto {
   private UUID orderId;
 
   @NotBlank
-  @Min(1) @Max(5)
+  @Min(value = 1, message = "별점은 1-5점 이어야 합니다.")
+  @Max(value = 5, message = "별점은 1-5점 이어야 합니다.")
   private Integer star;
 
   @NotBlank
-  @Size(min = 10)
+  @Size(min = 10, message = "10자 이상 입력해주세요.")
   private String content;
 }
