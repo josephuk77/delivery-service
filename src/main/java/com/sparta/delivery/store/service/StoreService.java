@@ -14,7 +14,6 @@ import com.sparta.delivery.store.entity.StoreCategory;
 import com.sparta.delivery.store.repository.StoreRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
-import com.sparta.delivery.user.repository.UserRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class StoreService {
 
   private final StoreRepository storeRepository;
-  private final UserRepository userRepository;
   private final FoodRepository foodRepository;
   private final ReviewRepository reviewRepository;
 
@@ -104,8 +102,6 @@ public class StoreService {
 
   @Transactional
   public StoreResponseDto createStore(StoreRequestDto requestDto, User user) {
-    findUser(user);
-
     checkUserRole(user);
 
     Store store = storeRepository.save(new Store(requestDto, user));
@@ -114,8 +110,6 @@ public class StoreService {
 
   @Transactional
   public StoreResponseDto updateStore(UUID storeId, StoreRequestDto requestDto, User user) {
-    findUser(user);
-
     checkUserRole(user);
 
     Store store = findStore(storeId);
@@ -130,8 +124,6 @@ public class StoreService {
 
   @Transactional
   public void deleteStore(UUID storeId, User user) {
-    findUser(user);
-
     checkUserRole(user);
 
     Store store = findStore(storeId);
@@ -140,11 +132,6 @@ public class StoreService {
 
     store.updateDelete(user.getId());
     storeRepository.save(store);
-  }
-
-  private void findUser(User user) {
-    userRepository.findByUsername(user.getUsername())
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 사용자입니다."));
   }
 
   private void checkUserRole(User user) {
