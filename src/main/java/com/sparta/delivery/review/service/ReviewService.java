@@ -9,6 +9,7 @@ import com.sparta.delivery.review.entity.Review;
 import com.sparta.delivery.review.repository.ReviewRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,22 @@ public class ReviewService {
     }
 
     Review review = reviewRepository.save(new Review(requestDto, user));
+
+    return new ReviewResponseDto(review);
+  }
+
+  @Transactional
+  public ReviewResponseDto updateReview(UUID reviewId, ReviewRequestDto requestDto,
+      User user) {
+    Review review = reviewRepository.findById(reviewId).orElseThrow(() ->
+        new GlobalException(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다."));
+
+    if (!review.getUser().getId().equals(user.getId())) {
+      throw new GlobalException(HttpStatus.FORBIDDEN, "작성자만 수정/삭제할 수 있습니다.");
+    }
+
+    review.update(requestDto);
+    reviewRepository.save(review);
 
     return new ReviewResponseDto(review);
   }
