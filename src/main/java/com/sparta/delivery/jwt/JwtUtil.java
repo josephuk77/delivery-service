@@ -28,7 +28,7 @@ public class JwtUtil {
   public static final String AUTHORIZATION_HEADER = "Authorization";
   private final String AUTHORIZATION_KEY = "auth";
   private final String BEARER_PREFIX = "Bearer ";
-  private final Long ACCESS_TIME = 60 * 60 * 1000L;
+  private final Long ACCESS_TIME =  60 * 60 * 1000L;
   private final Long REFRESH_TIME = 60 * 60 * 24 * 7 * 1000L;
 
 
@@ -80,15 +80,14 @@ public class JwtUtil {
     throw new GlobalException(HttpStatus.BAD_REQUEST, "토큰이 올바르지 않습니다.");
   }
 
-  public void validateToken(String token) {
+  public boolean validateToken(String token) {
     try {
       Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     } catch (SecurityException | MalformedJwtException | SignatureException e) {
       throw new GlobalException(HttpStatus.UNAUTHORIZED,
           "Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
     } catch (ExpiredJwtException e) {
-      throw new GlobalException(HttpStatus.UNAUTHORIZED,
-          "Expired JWT token, 만료된 JWT token 입니다.");
+      return false;
     } catch (UnsupportedJwtException e) {
       throw new GlobalException(HttpStatus.BAD_REQUEST,
           "Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
@@ -96,6 +95,8 @@ public class JwtUtil {
       throw new GlobalException(HttpStatus.BAD_REQUEST,
           "JWT claims is empty, 잘못된 JWT 토큰 입니다.");
     }
+
+    return true;
   }
 
   public Claims getUserInfoFromToken(String token) {
@@ -104,5 +105,9 @@ public class JwtUtil {
 
   public String getTokenFromRequest(HttpServletRequest req) {
     return req.getHeader(AUTHORIZATION_HEADER);
+  }
+
+  public UserRoleEnum getUserRoleFromClaims(Claims refreshClaims) {
+    return UserRoleEnum.valueOf(refreshClaims.get(AUTHORIZATION_KEY).toString());
   }
 }
