@@ -65,6 +65,7 @@ public class UserService {
 
   public void deleteUser(User user) {
     user.updateDelete(user.getId());
+    redisTemplate.delete(user.getUsername() );
     userRepository.save(user);
   }
 
