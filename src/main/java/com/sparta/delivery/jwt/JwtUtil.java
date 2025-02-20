@@ -29,6 +29,8 @@ public class JwtUtil {
   private final String AUTHORIZATION_KEY = "auth";
   private final String BEARER_PREFIX = "Bearer ";
   private final Long ACCESS_TIME = 60 * 60 * 1000L;
+  private final Long REFRESH_TIME = 60 * 60 * 24 * 7 * 1000L;
+
 
   @Value("${jwt.secret.key}")
   private String secretKey;
@@ -53,6 +55,18 @@ public class JwtUtil {
         .setIssuedAt(date)
         .signWith(key, signatureAlgorithm)
         .compact();
+  }
+
+  public String createRefreshToken(String username, UserRoleEnum role) {
+    Date date = new Date();
+
+    return Jwts.builder()
+            .setSubject(username)
+            .claim(AUTHORIZATION_KEY, role)
+            .setExpiration(new Date(date.getTime() + REFRESH_TIME))
+            .setIssuedAt(date)
+            .signWith(key, signatureAlgorithm)
+            .compact();
   }
 
   public void addJwtToHeader(String token, HttpServletResponse res) {
