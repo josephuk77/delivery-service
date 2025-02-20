@@ -18,7 +18,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "_p_reviews")
+@Table(name = "p_reviews")
 public class Review extends Timestamped {
 
   @Id
