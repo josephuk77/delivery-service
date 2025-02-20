@@ -2,6 +2,7 @@ package com.sparta.delivery.review.entity;
 
 import com.sparta.delivery.aaglobal.Timestamped;
 import com.sparta.delivery.order.entity.Order;
+import com.sparta.delivery.review.dto.ReviewRequestDto;
 import com.sparta.delivery.store.entity.Store;
 import com.sparta.delivery.user.entity.User;
 import jakarta.persistence.Column;
@@ -14,11 +15,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "p_reviews")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Review extends Timestamped {
 
   @Id
@@ -43,4 +48,11 @@ public class Review extends Timestamped {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "store_id")
   private Store store;
+
+  public Review(ReviewRequestDto requestDto, User user) {
+    this.id = requestDto.getOrderId();
+    this.star = requestDto.getStar();
+    this.content = requestDto.getContent();
+    this.user = user;
+  }
 }
