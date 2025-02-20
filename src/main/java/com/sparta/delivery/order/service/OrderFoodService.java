@@ -8,6 +8,8 @@ import com.sparta.delivery.order.entity.OrderFood;
 import com.sparta.delivery.order.repository.OrderFoodRepository;
 import com.sparta.delivery.order.repository.OrderRepository;
 import com.sparta.delivery.user.entity.User;
+import jakarta.transaction.Transactional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -42,4 +44,18 @@ public class OrderFoodService {
 
     orderFoodRepository.save(new OrderFood(food, order, requestDto.getQuantity()));
   }
+
+
+  @Transactional
+  public void updateOrderFood(UUID orderFoodId, User user, int quantity) {
+    OrderFood orderFood = orderFoodRepository.findById(orderFoodId)
+        .orElseThrow(() -> new IllegalArgumentException("주문 음식을 찾을 수 없습니다."));
+
+    if (!orderFood.getOrder().getUser().getId().equals(user.getId())) {
+      throw new IllegalArgumentException("본인의 주문만 수정할 수 있습니다.");
+    }
+
+    orderFood.updateQuantity(quantity);
+  }
+
 }
