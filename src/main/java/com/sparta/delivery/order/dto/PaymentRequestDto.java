@@ -1,11 +1,14 @@
 package com.sparta.delivery.order.dto;
 
 import com.sparta.delivery.order.entity.PaymentStatus;
-import com.sparta.delivery.user.entity.User;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaymentRequestDto {
 
   private String userNickname;
@@ -13,5 +16,4 @@ public class PaymentRequestDto {
   private PaymentStatus status;
   private UUID orderId;
 
-  public PaymentRequestDto(User user, )
 }

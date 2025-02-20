@@ -1,6 +1,7 @@
 package com.sparta.delivery.order.entity;
 
 import com.sparta.delivery.aaglobal.Timestamped;
+import com.sparta.delivery.food.entity.Food;
 import com.sparta.delivery.order.dto.OrderRequestDto;
 import com.sparta.delivery.store.entity.Store;
 import com.sparta.delivery.user.entity.User;
@@ -54,11 +55,11 @@ public class Order extends Timestamped {
   @JoinColumn(name = "store_id")
   private Store store;
 
-  public Order(OrderRequestDto requestDto, User user, Store store) {
+  public Order(OrderRequestDto requestDto, User user, Store store, Food food, int quantity) {
     this.request = requestDto.getRequest();
     this.address = requestDto.getAddress();
-    this.totalPrice = Integer.parseInt(requestDto.getTotalPrice());
-    this.isDelivery = requestDto.isDelivery();
+    this.totalPrice = food.getPrice() * quantity;
+    this.isDelivery = false;
     this.status = requestDto.getStatus();
     this.user = user;
     this.store = store;

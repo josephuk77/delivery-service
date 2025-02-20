@@ -9,5 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
 
-  List<OrderRequestDto> findAllByUser(User user);
+  List<OrderRequestDto> findAllByUserAndDeletedAtIsNull(User user);
+
 }

@@ -1,12 +1,18 @@
 package com.sparta.delivery.order.dto;
 
 import com.sparta.delivery.order.entity.Order;
+import com.sparta.delivery.order.entity.OrderFood;
 import com.sparta.delivery.store.entity.Store;
 import com.sparta.delivery.user.entity.User;
+import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderDetailResponseDto {
 
   private UUID id;
@@ -18,8 +24,9 @@ public class OrderDetailResponseDto {
   private String status;
   private String storeName;
   private String storePhone;
+  private List<OrderFoodResponseDto> orderFoods;
 
-  public OrderDetailResponseDto(Order order, Store store, User user) {
+  public OrderDetailResponseDto(Order order, Store store, User user, List<OrderFood> orderFoods) {
     this.id = order.getId();
     this.customerNickname = user.getNickname();
     this.request = order.getRequest();
@@ -29,5 +36,8 @@ public class OrderDetailResponseDto {
     this.status = order.getStatus().name();
     this.storeName = store.getName();
     this.storePhone = store.getPhone();
+    for (OrderFood orderFood : orderFoods) {
+      this.orderFoods.add(new OrderFoodResponseDto(orderFood));
+    }
   }
 }

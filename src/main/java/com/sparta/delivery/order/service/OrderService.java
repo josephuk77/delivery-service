@@ -1,8 +1,12 @@
 package com.sparta.delivery.order.service;
 
+import com.sparta.delivery.food.entity.Food;
+import com.sparta.delivery.food.repository.FoodRepository;
 import com.sparta.delivery.order.dto.OrderDetailResponseDto;
 import com.sparta.delivery.order.dto.OrderRequestDto;
 import com.sparta.delivery.order.entity.Order;
+import com.sparta.delivery.order.entity.OrderFood;
+import com.sparta.delivery.order.repository.OrderFoodRepository;
 import com.sparta.delivery.order.repository.OrderRepository;
 import com.sparta.delivery.store.entity.Store;
 import com.sparta.delivery.store.repository.StoreRepository;
@@ -22,11 +26,21 @@ public class OrderService {
 
   private final StoreRepository storeRepository;
 
+  private final OrderFoodRepository orderFoodRepository;
+
+  private final FoodRepository foodRepository;
+
   public void createOrder(OrderRequestDto orderRequest, User user) {
     Store store = storeRepository.findById(UUID.fromString(orderRequest.getStoreId()))
         .orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
 
-    orderRepository.save(new Order(orderRequest, user, store));
+    Food food = foodRepository.findById(UUID.fromString(String.valueOf(orderRequest.getFoodId())))
+        .orElseThrow(() -> new IllegalArgumentException("음식을 찾을 수 없습니다."));
+
+    Order order = orderRepository.save(
+        new Order(orderRequest, user, store, food, orderRequest.getQuantity()));
+
+    orderFoodRepository.save(new OrderFood(food, order, orderRequest.getQuantity()));
   }
 
   public OrderDetailResponseDto getOrderDetail(UUID orderId, User user) {
@@ -36,11 +50,13 @@ public class OrderService {
     Store store = storeRepository.findById(order.getStore().getId())
         .orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
 
-    return new OrderDetailResponseDto(order, store, user);
+    List<OrderFood> orderFoods = orderFoodRepository.findByOrderIdAndDeletedAtIsNull(orderId);
+
+    return new OrderDetailResponseDto(order, store, user, orderFoods);
   }
 
   public List<OrderRequestDto> getOrderList(User user) {
-    return orderRepository.findAllByUser(user);
+    return orderRepository.findAllByUserAndDeletedAtIsNull(user);
   }
 
   @Transactional
@@ -55,6 +71,7 @@ public class OrderService {
     order.updateIsDelivery(isDelivery);
   }
 
+  @Transactional
   public void deleteOrder(UUID orderId, User user) {
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
@@ -63,6 +80,8 @@ public class OrderService {
       throw new IllegalArgumentException("관리자만 주문을 삭제할 수 있습니다.");
     }
 
-    orderRepository.delete(order);
+    order.updateDelete(user.getId());
   }
+
+
 }

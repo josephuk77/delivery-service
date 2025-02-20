@@ -42,4 +42,16 @@ public class OrderFood extends Timestamped {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "food_id")
   private Food food;
+
+  public OrderFood(Food food, Order order, int quantity) {
+    this.foodName = food.getName();
+    this.foodPrice = food.getPrice();
+    this.quantity = quantity;
+    this.order = order;
+    this.food = food;
+  }
+
+  public void updateQuantity(int quantity) {
+    this.quantity = quantity;
+  }
 }
