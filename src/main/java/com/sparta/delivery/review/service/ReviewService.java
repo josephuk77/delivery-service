@@ -25,18 +25,13 @@ public class ReviewService {
   @Transactional
   public ReviewResponseDto createReview(ReviewRequestDto requestDto, User user) {
     // CUSTOMER 인지 검증
-    if (!user.getRole().equals(UserRoleEnum.CUSTOMER)) {
-      throw new GlobalException(HttpStatus.FORBIDDEN, "고객만 리뷰를 작성할 수 있습니다.");
-    }
+    validateCustomer(user);
 
     // 주문을 했는지 검증
-    Order order = orderRepository.findById(requestDto.getOrderId()).orElseThrow(() ->
-        new GlobalException(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다."));
+    Order order = getOrder(requestDto);
 
     // 주문한 사용자인지 검증
-    if (!order.getUser().getId().equals(user.getId())) {
-      throw new GlobalException(HttpStatus.FORBIDDEN, "주문한 사용자만 리뷰를 작성할 수 있습니다.");
-    }
+    validateOrderUser(user, order);
 
     Review review = reviewRepository.save(new Review(requestDto, user));
 
@@ -46,12 +41,9 @@ public class ReviewService {
   @Transactional
   public ReviewResponseDto updateReview(UUID reviewId, ReviewRequestDto requestDto,
       User user) {
-    Review review = reviewRepository.findById(reviewId).orElseThrow(() ->
-        new GlobalException(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다."));
+    Review review = getReview(reviewId);
 
-    if (!review.getUser().getId().equals(user.getId())) {
-      throw new GlobalException(HttpStatus.FORBIDDEN, "작성자만 수정/삭제할 수 있습니다.");
-    }
+    validateReviewAuthor(user, review);
 
     review.update(requestDto);
     reviewRepository.save(review);
@@ -61,13 +53,38 @@ public class ReviewService {
 
   @Transactional
   public void deleteReview(UUID reviewId, User user) {
-    Review review = reviewRepository.findById(reviewId).orElseThrow(() ->
-        new GlobalException(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다."));
+    Review review = getReview(reviewId);
 
+    validateReviewAuthor(user, review);
+    review.updateDelete(user.getId());
+    reviewRepository.save(review);
+  }
+
+  private Order getOrder(ReviewRequestDto requestDto) {
+    return orderRepository.findById(requestDto.getOrderId()).orElseThrow(() ->
+        new GlobalException(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다."));
+  }
+
+  private Review getReview(UUID reviewId) {
+    return reviewRepository.findById(reviewId).orElseThrow(() ->
+        new GlobalException(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다."));
+  }
+
+  private void validateCustomer(User user) {
+    if (!user.getRole().equals(UserRoleEnum.CUSTOMER)) {
+      throw new GlobalException(HttpStatus.FORBIDDEN, "고객만 리뷰를 작성할 수 있습니다.");
+    }
+  }
+
+  private void validateOrderUser(User user, Order order) {
+    if (!order.getUser().getId().equals(user.getId())) {
+      throw new GlobalException(HttpStatus.FORBIDDEN, "주문한 사용자만 리뷰를 작성할 수 있습니다.");
+    }
+  }
+
+  private void validateReviewAuthor(User user, Review review) {
     if (!review.getUser().getId().equals(user.getId())) {
       throw new GlobalException(HttpStatus.FORBIDDEN, "작성자만 수정/삭제할 수 있습니다.");
     }
-    review.updateDelete(user.getId());
-    reviewRepository.save(review);
   }
 }
