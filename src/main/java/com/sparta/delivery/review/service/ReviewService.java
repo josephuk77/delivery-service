@@ -58,4 +58,16 @@ public class ReviewService {
 
     return new ReviewResponseDto(review);
   }
+
+  @Transactional
+  public void deleteReview(UUID reviewId, User user) {
+    Review review = reviewRepository.findById(reviewId).orElseThrow(() ->
+        new GlobalException(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다."));
+
+    if (!review.getUser().getId().equals(user.getId())) {
+      throw new GlobalException(HttpStatus.FORBIDDEN, "작성자만 수정/삭제할 수 있습니다.");
+    }
+    review.updateDelete(user.getId());
+    reviewRepository.save(review);
+  }
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,5 +43,14 @@ public class ReviewController {
     ReviewResponseDto responseDto = reviewService.updateReview(reviewId, requestDto,
         userDetails.getUser());
     return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+  }
+
+  @DeleteMapping("{reviewId}")
+  public ResponseEntity<?> deleteReview(
+      @PathVariable UUID reviewId,
+      @AuthenticationPrincipal UserDetailsImpl userDetails
+  ) {
+    reviewService.deleteReview(reviewId, userDetails.getUser());
+    return ResponseEntity.status(HttpStatus.OK).body("삭제가 완료되었습니다.");
   }
 }
