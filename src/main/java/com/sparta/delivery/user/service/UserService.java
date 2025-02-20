@@ -1,6 +1,7 @@
 package com.sparta.delivery.user.service;
 
 import com.sparta.delivery.aaglobal.GlobalException;
+import com.sparta.delivery.jwt.UserDetailsImpl;
 import com.sparta.delivery.user.dto.UserRequestDto;
 import com.sparta.delivery.user.dto.UserResponseDto;
 import com.sparta.delivery.user.entity.User;
@@ -9,6 +10,7 @@ import com.sparta.delivery.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final RedisTemplate<String, String> redisTemplate;
+
 
   @Value("${admin.key}")
   private String ADMIN_KEY;
@@ -83,5 +87,11 @@ public class UserService {
   private User findUser(Long id) {
     return userRepository.findById(id)
         .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+  }
+
+  public void logout(UserDetailsImpl userDetails) {
+
+    String username = userDetails.getUser().getUsername();
+    redisTemplate.delete(username);
   }
 }
