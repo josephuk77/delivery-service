@@ -1,7 +1,6 @@
 package com.sparta.delivery.store.service;
 
 import com.sparta.delivery.aaglobal.GlobalException;
-import com.sparta.delivery.review.repository.ReviewRepository;
 import com.sparta.delivery.store.dto.StoreDetailResponseDto;
 import com.sparta.delivery.store.dto.StoreRequestDto;
 import com.sparta.delivery.store.dto.StoreResponseDto;
@@ -11,7 +10,6 @@ import com.sparta.delivery.store.entity.StoreCategory;
 import com.sparta.delivery.store.repository.StoreRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
-import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,14 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class StoreService {
 
   private final StoreRepository storeRepository;
-  private final ReviewRepository reviewRepository;
 
   @Transactional(readOnly = true)
   public StoreDetailResponseDto getStore(UUID storeId) {
     Store store = findStore(storeId);
-
-    Integer reviewCount = reviewRepository.countByStoreId(storeId);
-    BigDecimal ratingAvg = reviewRepository.calculateAverageRatingByStoreId(storeId);
 
     return new StoreDetailResponseDto(
         storeId,
@@ -43,8 +37,8 @@ public class StoreService {
         store.getContent(),
         store.getAddress(),
         store.getPhone(),
-        ratingAvg,
-        reviewCount
+        store.getRatingAvg(),
+        store.getReviewCount()
     );
   }
 
@@ -59,11 +53,10 @@ public class StoreService {
     Pageable pageable = PageRequest.of(page, size, direction, sortedBy);
     Page<Store> storePage = storeRepository.findAllByName(keyword, pageable);
 
-    return storePage.map(store -> {
-      Integer reviewCount = reviewRepository.countByStoreId(store.getId());
-      BigDecimal ratingAvg = reviewRepository.calculateAverageRatingByStoreId(store.getId());
-      return new StoreSearchResponseDto(store.getId(), store.getName(), ratingAvg, reviewCount);
-    });
+    return storePage.map(store ->
+        new StoreSearchResponseDto(store.getId(), store.getName(), store.getRatingAvg(),
+            store.getReviewCount())
+    );
   }
 
   @Transactional(readOnly = true)
@@ -78,11 +71,10 @@ public class StoreService {
     Pageable pageable = PageRequest.of(page, size, direction, sortedBy);
     Page<Store> storePage = storeRepository.findAllByCategory(storeCategory, pageable);
 
-    return storePage.map(store -> {
-      Integer reviewCount = reviewRepository.countByStoreId(store.getId());
-      BigDecimal ratingAvg = reviewRepository.calculateAverageRatingByStoreId(store.getId());
-      return new StoreSearchResponseDto(store.getId(), store.getName(), ratingAvg, reviewCount);
-    });
+    return storePage.map(store ->
+        new StoreSearchResponseDto(store.getId(), store.getName(), store.getRatingAvg(),
+            store.getReviewCount())
+    );
   }
 
   @Transactional
@@ -90,6 +82,7 @@ public class StoreService {
     checkUserRole(user);
 
     Store store = storeRepository.save(new Store(requestDto, user));
+
     return new StoreResponseDto(store);
   }
 
@@ -128,7 +121,7 @@ public class StoreService {
 
   private Store findStore(UUID storeId) {
     return storeRepository.findById(storeId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 가게입니다."));
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "가게를 찾을 수 없습니다."));
   }
 
   private static void validateStoreOwner(User user, Store store) {
