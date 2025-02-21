@@ -63,7 +63,7 @@ public class ReviewController {
     return ResponseEntity.status(HttpStatus.OK).body(responseDto);
   }
 
-  @DeleteMapping("{reviewId}")
+  @DeleteMapping("/{reviewId}")
   public ResponseEntity<?> deleteReview(
       @PathVariable UUID reviewId,
       @AuthenticationPrincipal UserDetailsImpl userDetails
