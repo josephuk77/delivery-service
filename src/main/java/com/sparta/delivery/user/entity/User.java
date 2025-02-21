@@ -1,6 +1,7 @@
 package com.sparta.delivery.user.entity;
 
 import com.sparta.delivery.aaglobal.Timestamped;
+import com.sparta.delivery.address.entity.Address;
 import com.sparta.delivery.user.dto.UserRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,5 +55,9 @@ public class User extends Timestamped {
     this.email = requestDto.getEmail();
     this.nickname = requestDto.getNickname();
     this.currentAddress = requestDto.getCurrentAddress();
+  }
+
+  public void updateCurrentAddress(Address address) {
+    this.currentAddress = address.getAddress();
   }
 }
