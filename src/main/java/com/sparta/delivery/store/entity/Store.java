@@ -13,8 +13,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,6 +56,9 @@ public class Store extends Timestamped {
   @Column(precision = 3, scale = 1)
   private BigDecimal ratingAvg = BigDecimal.ZERO;
 
+  @Column(name = "last_review_updated_at")
+  private LocalDateTime lastReviewUpdatedAt;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
@@ -67,12 +72,32 @@ public class Store extends Timestamped {
     this.user = user;
   }
 
+  // 가게 정보가 수정된 경우에만 updatedAt 갱신
+  @PreUpdate
+  public void preUpdate() {
+    if (!this.getCreatedAt().equals(this.getUpdatedAt())) {
+      this.modifyUpdatedAt(LocalDateTime.now());
+    }
+  }
+
   public void update(StoreRequestDto requestDto) {
     this.category = StoreCategory.fromString(requestDto.getCategory());
     this.name = requestDto.getName();
     this.content = requestDto.getContent();
     this.address = requestDto.getAddress();
     this.phone = requestDto.getPhone();
+  }
+
+  public void updateReviewStats(Integer reviewCount, BigDecimal ratingAvg) {
+    this.reviewCount = reviewCount;
+    this.ratingAvg = ratingAvg;
+
+    // 리뷰 통계 갱신 시마다 lastReviewUpdatedAt 갱신
+    updateLastReviewUpdatedAt();
+  }
+
+  private void updateLastReviewUpdatedAt() {
+    this.lastReviewUpdatedAt = LocalDateTime.now();
   }
 }
 

@@ -8,9 +8,13 @@ import com.sparta.delivery.review.dto.ReviewResponseDto;
 import com.sparta.delivery.review.dto.StoreReviewsResponseDto;
 import com.sparta.delivery.review.entity.Review;
 import com.sparta.delivery.review.repository.ReviewRepository;
+import com.sparta.delivery.store.entity.Store;
+import com.sparta.delivery.store.repository.StoreRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,6 +31,7 @@ public class ReviewService {
 
   private final ReviewRepository reviewRepository;
   private final OrderRepository orderRepository;
+  private final StoreRepository storeRepository;
 
   @Transactional(readOnly = true)
   public Page<StoreReviewsResponseDto> getReviewsByStore(
@@ -38,12 +43,18 @@ public class ReviewService {
   ) {
     Pageable pageable = PageRequest.of(page, size, direction, sortedBy);
     Page<Review> reviewPage = reviewRepository.findAllByStoreId(storeId, pageable);
-    return reviewPage.map(review -> {
-      Integer reviewCount = reviewRepository.countByStoreId(storeId);
-      BigDecimal ratingAvg = reviewRepository.calculateAverageRatingByStoreId(storeId);
-      return new StoreReviewsResponseDto(review.getId(), review.getUser().getId(),
-          review.getOrder().getId(), review.getStar(), review.getContent(), ratingAvg, reviewCount);
-    });
+
+    Store store = getStore(storeId);
+
+    // 리뷰 통계 데이터 최신 유지
+    checkLastReviewUpdateTime(storeId, store);
+
+    Integer reviewCount = store.getReviewCount();
+    BigDecimal ratingAvg = store.getRatingAvg();
+
+    return reviewPage.map(review -> new StoreReviewsResponseDto(
+        review.getId(), review.getUser().getId(),
+        review.getOrder().getId(), review.getStar(), review.getContent(), ratingAvg, reviewCount));
   }
 
   @Transactional
@@ -56,6 +67,8 @@ public class ReviewService {
 
     Review review = reviewRepository.save(new Review(requestDto, user));
 
+    updateStoreReviewStats(review.getStore().getId());
+
     return new ReviewResponseDto(review);
   }
 
@@ -63,11 +76,12 @@ public class ReviewService {
   public ReviewResponseDto updateReview(UUID reviewId, ReviewRequestDto requestDto,
       User user) {
     Review review = getReview(reviewId);
-
     validateReviewAuthor(user, review);
 
     review.update(requestDto);
     reviewRepository.save(review);
+
+    updateStoreReviewStats(review.getStore().getId());
 
     return new ReviewResponseDto(review);
   }
@@ -77,8 +91,29 @@ public class ReviewService {
     Review review = getReview(reviewId);
 
     validateReviewAuthor(user, review);
+
     review.updateDelete(user.getId());
     reviewRepository.save(review);
+
+    updateStoreReviewStats(review.getStore().getId());
+  }
+
+  // 가게의 리뷰 통계를 갱신하는 메서드
+  private void updateStoreReviewStats(UUID storeId) {
+    Store store = getStore(storeId);
+
+    // 리뷰 수와 평균 평점 계산
+    Integer reviewCount = reviewRepository.countByStoreId(storeId);
+    BigDecimal ratingAvg = reviewRepository.calculateAverageRatingByStoreId(storeId);
+
+    // 가게 리뷰 통계 업데이트
+    store.updateReviewStats(reviewCount, ratingAvg);
+    storeRepository.save(store);
+  }
+
+  private Store getStore(UUID storeId) {
+    return storeRepository.findById(storeId)
+        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "존재하지 않는 가게입니다."));
   }
 
   private Order getOrder(ReviewRequestDto requestDto) {
@@ -89,6 +124,15 @@ public class ReviewService {
   private Review getReview(UUID reviewId) {
     return reviewRepository.findById(reviewId).orElseThrow(() ->
         new GlobalException(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다."));
+  }
+
+  private void checkLastReviewUpdateTime(UUID storeId, Store store) {
+    LocalDateTime lastUpdateTime = Optional.ofNullable(store.getLastReviewUpdatedAt())
+        .orElse(LocalDateTime.MIN);
+
+    if (lastUpdateTime.isBefore(LocalDateTime.now().minusDays(1))) {
+      updateStoreReviewStats(storeId);
+    }
   }
 
   private void validateCustomer(User user) {
