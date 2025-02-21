@@ -17,7 +17,6 @@ public class ReviewResponseDto {
   private Integer star;
   private String content;
 
-
   public ReviewResponseDto(Review review) {
     this.reviewId = review.getId();
     this.userId = review.getUser().getId();

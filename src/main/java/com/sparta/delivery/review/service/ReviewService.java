@@ -5,12 +5,18 @@ import com.sparta.delivery.order.entity.Order;
 import com.sparta.delivery.order.repository.OrderRepository;
 import com.sparta.delivery.review.dto.ReviewRequestDto;
 import com.sparta.delivery.review.dto.ReviewResponseDto;
+import com.sparta.delivery.review.dto.StoreReviewsResponseDto;
 import com.sparta.delivery.review.entity.Review;
 import com.sparta.delivery.review.repository.ReviewRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
+import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +27,24 @@ public class ReviewService {
 
   private final ReviewRepository reviewRepository;
   private final OrderRepository orderRepository;
+
+  @Transactional(readOnly = true)
+  public Page<StoreReviewsResponseDto> getReviewsByStore(
+      UUID storeId,
+      int page,
+      int size,
+      String sortedBy,
+      Direction direction
+  ) {
+    Pageable pageable = PageRequest.of(page, size, direction, sortedBy);
+    Page<Review> reviewPage = reviewRepository.findAllByStoreId(storeId, pageable);
+    return reviewPage.map(review -> {
+      Integer reviewCount = reviewRepository.countByStoreId(storeId);
+      BigDecimal ratingAvg = reviewRepository.calculateAverageRatingByStoreId(storeId);
+      return new StoreReviewsResponseDto(review.getId(), review.getUser().getId(),
+          review.getOrder().getId(), review.getStar(), review.getContent(), ratingAvg, reviewCount);
+    });
+  }
 
   @Transactional
   public ReviewResponseDto createReview(ReviewRequestDto requestDto, User user) {
