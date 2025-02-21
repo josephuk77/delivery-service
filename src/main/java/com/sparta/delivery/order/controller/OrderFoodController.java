@@ -6,6 +6,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,6 +33,13 @@ public class OrderFoodController {
       @AuthenticationPrincipal UserDetailsImpl userDetails,
       @RequestParam int quantity) {
     orderFoodService.updateOrderFood(orderFoodId, userDetails.getUser(), quantity);
+    return ResponseEntity.ok().build();
+  }
+
+  @DeleteMapping("/{orderFoodId}")
+  public ResponseEntity<?> deleteOrderFood(@PathVariable UUID orderFoodId,
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    orderFoodService.deleteOrderFood(orderFoodId, userDetails.getUser());
     return ResponseEntity.ok().build();
   }
 }

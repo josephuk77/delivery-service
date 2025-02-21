@@ -58,4 +58,16 @@ public class OrderFoodService {
     orderFood.updateQuantity(quantity);
   }
 
+  @Transactional
+  public void deleteOrderFood(UUID orderFoodId, User user) {
+    OrderFood orderFood = orderFoodRepository.findById(orderFoodId)
+        .orElseThrow(() -> new IllegalArgumentException("주문 음식을 찾을 수 없습니다."));
+
+    if (!orderFood.getOrder().getUser().getId().equals(user.getId())) {
+      throw new IllegalArgumentException("본인의 주문만 삭제할 수 있습니다.");
+    }
+
+    orderFood.updateDelete();
+  }
+
 }
