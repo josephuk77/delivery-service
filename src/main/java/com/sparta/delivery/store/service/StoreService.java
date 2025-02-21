@@ -1,9 +1,6 @@
 package com.sparta.delivery.store.service;
 
 import com.sparta.delivery.aaglobal.GlobalException;
-import com.sparta.delivery.food.dto.FoodWithStoreResponseDto;
-import com.sparta.delivery.food.entity.Food;
-import com.sparta.delivery.food.repository.FoodRepository;
 import com.sparta.delivery.review.repository.ReviewRepository;
 import com.sparta.delivery.store.dto.StoreDetailResponseDto;
 import com.sparta.delivery.store.dto.StoreRequestDto;
@@ -15,9 +12,7 @@ import com.sparta.delivery.store.repository.StoreRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,20 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class StoreService {
 
   private final StoreRepository storeRepository;
-  private final FoodRepository foodRepository;
   private final ReviewRepository reviewRepository;
 
   @Transactional(readOnly = true)
   public StoreDetailResponseDto getStore(UUID storeId) {
     Store store = findStore(storeId);
-
-    List<Food> foods = foodRepository.findAllByStoreId(storeId);
-
-    List<FoodWithStoreResponseDto> foodDtos =
-        foods.stream()
-            .map(food -> new FoodWithStoreResponseDto(food.getId(), food.getName(),
-                food.getContent(), food.getPrice()))
-            .collect(Collectors.toList());
 
     Integer reviewCount = reviewRepository.countByStoreId(storeId);
     BigDecimal ratingAvg = reviewRepository.calculateAverageRatingByStoreId(storeId);
@@ -58,8 +44,7 @@ public class StoreService {
         store.getAddress(),
         store.getPhone(),
         ratingAvg,
-        reviewCount,
-        foodDtos
+        reviewCount
     );
   }
 
