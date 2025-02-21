@@ -8,12 +8,12 @@ import com.sparta.delivery.address.repository.AddressRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
 import com.sparta.delivery.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,12 +27,14 @@ public class AddressService {
     addressRepository.save(address);
   }
 
+  @Transactional(readOnly = true)
   public AddressResponseDto getAddress(UUID addressID, User user) {
     Address address = findAddress(addressID);
     checkPermission(user, address);
     return new AddressResponseDto(address);
   }
 
+  @Transactional(readOnly = true)
   public List<AddressResponseDto> getAllAddress(User user) {
     List<Address> addressList = addressRepository.findAllByUser(user);
     return addressList.stream()
