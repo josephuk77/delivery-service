@@ -1,0 +1,93 @@
+package com.sparta.delivery.order.service;
+
+import com.sparta.delivery.order.dto.PaymentDetailResponseDto;
+import com.sparta.delivery.order.dto.PaymentRequestDto;
+import com.sparta.delivery.order.dto.PaymentResponseDto;
+import com.sparta.delivery.order.entity.Order;
+import com.sparta.delivery.order.entity.OrderFood;
+import com.sparta.delivery.order.entity.Payment;
+import com.sparta.delivery.order.entity.PaymentStatus;
+import com.sparta.delivery.order.repository.OrderFoodRepository;
+import com.sparta.delivery.order.repository.OrderRepository;
+import com.sparta.delivery.order.repository.PaymentRepository;
+import com.sparta.delivery.user.entity.User;
+import com.sparta.delivery.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class PaymentService {
+
+  private final PaymentRepository paymentRepository;
+  private final UserRepository userRepository;
+  private final OrderRepository orderRepository;
+  private final OrderFoodRepository orderFoodRepository;
+
+  public void createPayment(PaymentRequestDto requestDto, User user) {
+    userRepository.findById(user.getId())
+        .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+    Order order = orderRepository.findById(requestDto.getOrderId())
+        .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
+
+    paymentRepository.save(new Payment(requestDto, user, order));
+  }
+
+  public List<PaymentResponseDto> getPaymentList(User user) {
+    List<Payment> paymentList = paymentRepository.findAllByUsernameAndDeletedAtIsNull(
+        user.getUsername());
+    List<PaymentResponseDto> responseDtoList = new ArrayList<>();
+
+    for (Payment payment : paymentList) {
+      responseDtoList.add(new PaymentResponseDto(payment, user));
+    }
+    return responseDtoList;
+  }
+
+  public PaymentDetailResponseDto getPaymentDetail(UUID paymentId, User user) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new IllegalArgumentException("결제를 찾을 수 없습니다."));
+
+    if (!payment.getOrder().getUser().getId().equals(user.getId())) {
+      throw new IllegalArgumentException("본인의 결제만 조회할 수 있습니다.");
+    }
+
+    List<OrderFood> orderFoodList = orderFoodRepository.findByOrderIdAndDeletedAtIsNull(
+        payment.getOrder().getId());
+
+    return new PaymentDetailResponseDto(payment, user, orderFoodList);
+  }
+
+  @Transactional
+  public void updatePayment(UUID paymentId, User user, int payPrice) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new IllegalArgumentException("결제를 찾을 수 없습니다."));
+
+    if (!payment.getOrder().getUser().getId().equals(user.getId())) {
+      throw new IllegalArgumentException("본인의 결제만 결제할 수 있습니다.");
+    }
+
+    if (!(payment.getPrice() == payPrice)) {
+      payment.updateStatus(PaymentStatus.REFUND);
+      throw new IllegalArgumentException("결제 금액이 일치하지 않습니다.");
+    }
+    payment.updateStatus(PaymentStatus.DONE);
+  }
+
+  @Transactional
+  public void deletePayment(UUID paymentId, User user) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new IllegalArgumentException("결제를 찾을 수 없습니다."));
+
+    if (!payment.getOrder().getUser().getId().equals(user.getId())) {
+      throw new IllegalArgumentException("본인의 결제만 삭제할 수 있습니다.");
+    }
+
+    payment.updateDelete(user.getId());
+  }
+}
