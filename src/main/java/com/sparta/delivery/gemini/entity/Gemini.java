@@ -11,24 +11,32 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Getter
 @Table(name = "p_gemini")
+@NoArgsConstructor
 public class Gemini extends Timestamped {
 
   @Id
   @UuidGenerator
   private UUID id;
 
-  @Column
+  @Column(length = 5000)
   private String question;
 
-  @Column
+  @Column(columnDefinition = "TEXT")
   private String answer;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
+
+  public Gemini(String question, String answer, User user) {
+    this.question = question;
+    this.answer = answer;
+    this.user = user;
+  }
 }

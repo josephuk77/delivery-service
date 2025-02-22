@@ -2,6 +2,7 @@ package com.sparta.delivery.review.entity;
 
 import com.sparta.delivery.aaglobal.Timestamped;
 import com.sparta.delivery.order.entity.Order;
+import com.sparta.delivery.store.entity.Store;
 import com.sparta.delivery.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,4 +39,8 @@ public class Review extends Timestamped {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id")
   private Order order;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "store_id")
+  private Store store;
 }

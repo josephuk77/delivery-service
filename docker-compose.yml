@@ -3,12 +3,18 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     ports:
       - "8080:8080"
     depends_on:
       - db
     container_name: delivery-backend
-  
+    volumes:
+      - ./src/main/java:/delivery/src/main/java  # ✅ Java 소스 코드 동기화
+      - ./src/main/resources:/delivery/src/main/resources  # ✅ 설정 파일 동기화
+    working_dir: /delivery
+    command: ./gradlew bootRun --continuous  # ✅ JAR 빌드 없이 실행
 
   db:
     image: postgres
@@ -17,6 +23,11 @@ services:
       - POSTGRES_PASSWORD=mypassword
       - POSTGRES_DB=delivery
     container_name: delivery-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
 
   pgadmin:
     image: dpage/pgadmin4
@@ -26,3 +37,6 @@ services:
     ports:
       - "8088:80"
     container_name: delivery-pgadmin
+
+volumes:
+  db_data:

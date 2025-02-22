@@ -29,3 +29,17 @@ logging:
       hibernate:
         SQL: debug
         type: trace
+
+springdoc:
+  show-login-endpoint: true
+
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+
+admin:
+  key: ${ADMIN_KEY}
+
+gemini:
+  secret:
+    key: ${GEMINI_SECRET_KEY}
