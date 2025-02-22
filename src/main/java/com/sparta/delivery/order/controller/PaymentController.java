@@ -6,6 +6,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,6 +46,13 @@ public class PaymentController {
       @AuthenticationPrincipal UserDetailsImpl userDetails,
       @RequestParam int payPrice) {
     paymentService.updatePayment(paymentId, userDetails.getUser(), payPrice);
+    return ResponseEntity.ok().build();
+  }
+
+  @DeleteMapping("/{paymentId}")
+  public ResponseEntity<?> deletePayment(@PathVariable UUID paymentId,
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    paymentService.deletePayment(paymentId, userDetails.getUser());
     return ResponseEntity.ok().build();
   }
 }

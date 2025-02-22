@@ -78,4 +78,16 @@ public class PaymentService {
     }
     payment.updateStatus(PaymentStatus.DONE);
   }
+
+  @Transactional
+  public void deletePayment(UUID paymentId, User user) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new IllegalArgumentException("결제를 찾을 수 없습니다."));
+
+    if (!payment.getOrder().getUser().getId().equals(user.getId())) {
+      throw new IllegalArgumentException("본인의 결제만 삭제할 수 있습니다.");
+    }
+
+    payment.updateDelete(user.getId());
+  }
 }
