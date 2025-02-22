@@ -1,7 +1,8 @@
 package com.sparta.delivery.order.dto;
 
+import com.sparta.delivery.order.entity.Order;
 import com.sparta.delivery.order.entity.OrderStatus;
-import java.util.UUID;
+import com.sparta.delivery.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +12,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderResponseDto {
 
-  private UUID id;
   private String userNickname;
   private String storeName;
   private OrderStatus status;
+
+  public OrderResponseDto(Order order, User user) {
+    this.userNickname = user.getNickname();
+    this.storeName = order.getStore().getName();
+    this.status = order.getStatus();
+  }
 }

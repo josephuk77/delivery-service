@@ -4,6 +4,7 @@ import com.sparta.delivery.food.entity.Food;
 import com.sparta.delivery.food.repository.FoodRepository;
 import com.sparta.delivery.order.dto.OrderDetailResponseDto;
 import com.sparta.delivery.order.dto.OrderRequestDto;
+import com.sparta.delivery.order.dto.OrderResponseDto;
 import com.sparta.delivery.order.entity.Order;
 import com.sparta.delivery.order.entity.OrderFood;
 import com.sparta.delivery.order.repository.OrderFoodRepository;
@@ -13,6 +14,7 @@ import com.sparta.delivery.store.repository.StoreRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -50,13 +52,19 @@ public class OrderService {
     Store store = storeRepository.findById(order.getStore().getId())
         .orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
 
-    List<OrderFood> orderFoods = orderFoodRepository.findByOrderIdAndDeletedAtIsNull(orderId);
+    List<OrderFood> orderFoodList = orderFoodRepository.findByOrderIdAndDeletedAtIsNull(orderId);
 
-    return new OrderDetailResponseDto(order, store, user, orderFoods);
+    return new OrderDetailResponseDto(order, store, user, orderFoodList);
   }
 
-  public List<OrderRequestDto> getOrderList(User user) {
-    return orderRepository.findAllByUserAndDeletedAtIsNull(user);
+  public List<OrderResponseDto> getOrderList(User user) {
+    List<Order> orderList = orderRepository.findAllByUserAndDeletedAtIsNull(user);
+    List<OrderResponseDto> orderRequestDtoList = new ArrayList<>();
+
+    for (Order order : orderList) {
+      orderRequestDtoList.add(new OrderResponseDto(order, user));
+    }
+    return orderRequestDtoList;
   }
 
   @Transactional

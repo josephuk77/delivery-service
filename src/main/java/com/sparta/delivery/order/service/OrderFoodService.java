@@ -67,7 +67,7 @@ public class OrderFoodService {
       throw new IllegalArgumentException("본인의 주문만 삭제할 수 있습니다.");
     }
 
-    orderFood.updateDelete();
+    orderFood.updateDelete(user.getId());
   }
 
 }
