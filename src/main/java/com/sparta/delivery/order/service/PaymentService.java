@@ -6,11 +6,13 @@ import com.sparta.delivery.order.dto.PaymentResponseDto;
 import com.sparta.delivery.order.entity.Order;
 import com.sparta.delivery.order.entity.OrderFood;
 import com.sparta.delivery.order.entity.Payment;
+import com.sparta.delivery.order.entity.PaymentStatus;
 import com.sparta.delivery.order.repository.OrderFoodRepository;
 import com.sparta.delivery.order.repository.OrderRepository;
 import com.sparta.delivery.order.repository.PaymentRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -57,7 +59,23 @@ public class PaymentService {
 
     List<OrderFood> orderFoodList = orderFoodRepository.findByOrderIdAndDeletedAtIsNull(
         payment.getOrder().getId());
-    
+
     return new PaymentDetailResponseDto(payment, user, orderFoodList);
+  }
+
+  @Transactional
+  public void updatePayment(UUID paymentId, User user, int payPrice) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new IllegalArgumentException("결제를 찾을 수 없습니다."));
+
+    if (!payment.getOrder().getUser().getId().equals(user.getId())) {
+      throw new IllegalArgumentException("본인의 결제만 결제할 수 있습니다.");
+    }
+
+    if (!(payment.getPrice() == payPrice)) {
+      payment.updateStatus(PaymentStatus.REFUND);
+      throw new IllegalArgumentException("결제 금액이 일치하지 않습니다.");
+    }
+    payment.updateStatus(PaymentStatus.DONE);
   }
 }

@@ -49,4 +49,8 @@ public class Payment extends Timestamped {
     this.status = requestDto.getStatus();
     this.order = order;
   }
+
+  public void updateStatus(PaymentStatus status) {
+    this.status = status;
+  }
 }
