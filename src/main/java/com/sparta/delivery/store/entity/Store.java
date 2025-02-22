@@ -74,10 +74,5 @@ public class Store extends Timestamped {
     this.address = requestDto.getAddress();
     this.phone = requestDto.getPhone();
   }
-
-  public void updateReviewStats(Integer reviewCount, BigDecimal ratingAvg) {
-    this.reviewCount = reviewCount;
-    this.ratingAvg = ratingAvg;
-  }
 }
 
