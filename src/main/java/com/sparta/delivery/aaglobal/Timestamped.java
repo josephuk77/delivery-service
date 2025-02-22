@@ -51,4 +51,5 @@ public abstract class Timestamped {
     this.createdBy = userId;
     this.updatedBy = userId;
   }
+
 }
