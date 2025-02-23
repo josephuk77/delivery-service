@@ -57,12 +57,10 @@ public class JwtUtil {
         .compact();
   }
 
-  public String createRefreshToken(String username, UserRoleEnum role) {
+  public String createRefreshToken() {
     Date date = new Date();
 
     return Jwts.builder()
-            .setSubject(username)
-            .claim(AUTHORIZATION_KEY, role)
             .setExpiration(new Date(date.getTime() + REFRESH_TIME))
             .setIssuedAt(date)
             .signWith(key, signatureAlgorithm)
@@ -107,7 +105,4 @@ public class JwtUtil {
     return req.getHeader(AUTHORIZATION_HEADER);
   }
 
-  public UserRoleEnum getUserRoleFromClaims(Claims refreshClaims) {
-    return UserRoleEnum.valueOf(refreshClaims.get(AUTHORIZATION_KEY).toString());
-  }
 }

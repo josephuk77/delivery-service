@@ -1,7 +1,9 @@
 package com.sparta.delivery.jwt;
 
 import com.sparta.delivery.aaglobal.GlobalException;
+import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
+import com.sparta.delivery.user.repository.UserRepository;
 import com.sparta.delivery.user.service.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -10,6 +12,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,6 +35,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
   private final JwtUtil jwtUtil;
   private final UserDetailsServiceImpl userDetailsService;
   private final RedisTemplate<String, String> redisTemplate;
+  private final UserRepository userRepository;
 
   @Override
   protected void doFilterInternal
@@ -47,8 +52,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     if(StringUtils.hasText(accessToken)) {
       accessToken = jwtUtil.substringToken(accessToken);
 
-      // access token 에서 claim 가져오기
+      // access token 에서 claim 과 sub를 가져오기
       Claims accessClaims = getAccessClaims(accessToken);
+      String username = accessClaims.getSubject();
 
       // access token claim 으로 refresh 토큰 가져오기
       String refreshToken = redisTemplate.opsForValue().get(accessClaims.getSubject());
@@ -56,13 +62,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
       // refresh token 이 완전하면
       if (StringUtils.hasText(refreshToken) && jwtUtil.validateToken(refreshToken)) {
 
-        // refresh token에서 sub, role 추출
-        Claims refreshClaims = jwtUtil.getUserInfoFromToken(refreshToken);
-        String username = refreshClaims.getSubject();
-        UserRoleEnum userRoleEnum = jwtUtil.getUserRoleFromClaims(refreshClaims);
-
         // access token이 만료되었다면
         if (!jwtUtil.validateToken(accessToken)) {
+
+          // repository 에서 user 에 관한 정보를 가져옴
+          User user = this.userRepository.findByUsername(accessClaims.getSubject()).orElseThrow(()->
+                  new GlobalException(HttpStatus.NO_CONTENT, "토큰에 해당하는 유저가 존재하지 않습니다. "));
+
+          // User에서 role 추출
+          UserRoleEnum userRoleEnum = user.getRole();
 
           // 새로운 access token을 발급하여 헤더에 넣어줌
           String newAccessToken = jwtUtil.createAccessToken(username, userRoleEnum);
