@@ -3,11 +3,13 @@ package com.sparta.delivery.review.entity;
 import com.sparta.delivery.review.repository.ReviewRepository;
 import com.sparta.delivery.store.repository.StoreRepository;
 import java.math.BigDecimal;
-import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -18,13 +20,17 @@ public class ReviewStatisticsScheduler {
 
   private final ReviewRepository reviewRepository;
   private final StoreRepository storeRepository;
+  private final RedisTemplate<String, Object> redisTemplate;
 
-  // 변경된 storeId를 추적할 Set (중복 없이 관리)
-  private final Set<UUID> updatedStoreIds = new HashSet<>();
+  // Redis key 설정
+  private static final String UPDATED_STORE_ID_KEY = "review:updated_storeId";
+  // TTL 1시간 설정
+  private static final long TTL_IN_SECONDS = 3600;
 
   // 리뷰 변경 시 호출하여 변경된 가게를 추적
   public void trackStoreId(UUID storeId) {
-    updatedStoreIds.add(storeId);
+    redisTemplate.opsForSet().add(UPDATED_STORE_ID_KEY, storeId.toString());
+    redisTemplate.expire(UPDATED_STORE_ID_KEY, TTL_IN_SECONDS, TimeUnit.SECONDS);
   }
 
   // 스케줄러에서 변경된 가게만 통계 업데이트
@@ -32,23 +38,25 @@ public class ReviewStatisticsScheduler {
   public void updateReviewStatistics() {
     log.info("리뷰 통계 업데이트 시작");
 
-    if (updatedStoreIds.isEmpty()) {
-      log.info("변경된 가게가 없습니다.");
-      return;  // 변경된 가게가 없다면 종료
-    }
+    Optional<Set<Object>> updatedStoreIdsOptional = Optional.ofNullable(
+        redisTemplate.opsForSet().members(UPDATED_STORE_ID_KEY));
 
-    for (UUID storeId : updatedStoreIds) {
-      Integer reviewCount = reviewRepository.countByStoreId(storeId);
-      BigDecimal avgRating = reviewRepository.calculateAverageRatingByStoreId(storeId);
+    updatedStoreIdsOptional.ifPresent(updatedStoreIds -> {
+      if (!updatedStoreIds.isEmpty()) {
+        for (Object storeIdObj : updatedStoreIds) {
+          UUID storeId = UUID.fromString(storeIdObj.toString());
 
-      storeRepository.updateReviewStatistics(storeId, reviewCount, avgRating);
-      log.info("가게 {} 통계 업데이트 완료", storeId);
-    }
+          Integer reviewCount = reviewRepository.countByStoreId(storeId);
+          BigDecimal avgRating = reviewRepository.calculateAverageRatingByStoreId(storeId);
 
-    // 업데이트 후 추적 리스트 비우기
-    updatedStoreIds.clear();
-
-    log.info("리뷰 통계 업데이트 완료");
+          storeRepository.updateReviewStatistics(storeId, reviewCount, avgRating);
+          log.info("가게 {} 통계 업데이트 완료", storeId);
+        }
+        // 업데이트 후 추적 리스트 비우기
+        redisTemplate.delete(UPDATED_STORE_ID_KEY);
+      } else {
+        log.info("변경된 가게가 없습니다.");
+      }
+    });
   }
-
 }
