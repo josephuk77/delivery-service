@@ -5,10 +5,11 @@ import com.sparta.delivery.gemini.entity.Gemini;
 import java.util.List;
 import java.util.UUID;
 
-import com.sparta.delivery.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GeminiRepository extends JpaRepository<Gemini, UUID> {
 
-    List<Gemini> findByUserId(Long Id);
+    Page<Gemini> findByUserIdOrderByCreatedAtDesc(Long Id, Pageable pageable);
 }

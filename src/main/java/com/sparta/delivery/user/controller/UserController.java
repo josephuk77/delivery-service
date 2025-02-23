@@ -30,7 +30,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
   }
 
-  @PostMapping("/admin/signup")
+  @PostMapping("/signup/admin")
   public ResponseEntity<?> adminSignup(@Valid @RequestBody UserRequestDto requestDto) {
     userService.adminSignup(requestDto);
     return ResponseEntity.status(HttpStatus.CREATED).body("관리자 회원가입이 완료되었습니다.");

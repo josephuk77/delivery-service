@@ -11,12 +11,8 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -59,17 +55,8 @@ public class JwtUtil {
         .compact();
   }
 
-  public void addJwtToCookie(String token, HttpServletResponse res) {
-    try {
-      token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
-
-      Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
-      cookie.setPath("/");
-
-      res.addCookie(cookie);
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e.getMessage());
-    }
+  public void addJwtToHeader(String token, HttpServletResponse res) {
+    res.setHeader(AUTHORIZATION_HEADER, token);
   }
 
   public String substringToken(String token) {
@@ -83,10 +70,10 @@ public class JwtUtil {
     try {
       Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     } catch (SecurityException | MalformedJwtException | SignatureException e) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST,
+      throw new GlobalException(HttpStatus.UNAUTHORIZED,
           "Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
     } catch (ExpiredJwtException e) {
-      throw new GlobalException(HttpStatus.BAD_REQUEST,
+      throw new GlobalException(HttpStatus.UNAUTHORIZED,
           "Expired JWT token, 만료된 JWT token 입니다.");
     } catch (UnsupportedJwtException e) {
       throw new GlobalException(HttpStatus.BAD_REQUEST,
@@ -102,18 +89,6 @@ public class JwtUtil {
   }
 
   public String getTokenFromRequest(HttpServletRequest req) {
-    Cookie[] cookies = req.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
-          try {
-            return URLDecoder.decode(cookie.getValue(), "UTF-8");
-          } catch (UnsupportedEncodingException e) {
-            return null;
-          }
-        }
-      }
-    }
-    return null;
+    return req.getHeader(AUTHORIZATION_HEADER);
   }
 }

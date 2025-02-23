@@ -18,9 +18,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
   private final JwtUtil jwtUtil;
+  private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-  public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+  public JwtAuthenticationFilter(JwtUtil jwtUtil, JwtAuthenticationEntryPoint entryPoint) {
     this.jwtUtil = jwtUtil;
+    this.jwtAuthenticationEntryPoint = entryPoint;
     setFilterProcessesUrl("/users/login");
   }
 
@@ -51,13 +53,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     UserRoleEnum role = ((UserDetailsImpl) authResult.getPrincipal()).getRole();
 
     String token = jwtUtil.createAccessToken(username, role);
-    jwtUtil.addJwtToCookie(token, response);
+    jwtUtil.addJwtToHeader(token, response);
   }
 
   @Override
   protected void unsuccessfulAuthentication
       (HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
       throws IOException, ServletException {
-    response.setStatus(401);
+    jwtAuthenticationEntryPoint.commence(request, response, failed);
   }
 }
