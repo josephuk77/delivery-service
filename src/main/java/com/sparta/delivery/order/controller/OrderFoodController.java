@@ -1,5 +1,6 @@
 package com.sparta.delivery.order.controller;
 
+import com.sparta.delivery.jwt.UserDetailsImpl;
 import com.sparta.delivery.order.dto.OrderFoodRequestDto;
 import com.sparta.delivery.order.service.OrderFoodService;
 import java.util.UUID;
