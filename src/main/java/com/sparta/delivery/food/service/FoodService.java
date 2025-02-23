@@ -117,4 +117,10 @@ public class FoodService {
             throw new GlobalException(HttpStatus.FORBIDDEN, "해당 권한을 가지고 있지 않습니다. ");
         }
     }
+
+    public Page<FoodResponseDto> listFoodByStoreId(UUID storeId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<FoodResponseDto> listDto = this.foodRepository.findByStoreId(storeId, pageable).stream().map(FoodResponseDto::new).toList();
+        return new PageImpl<>(listDto, pageable, listDto.size());
+    }
 }
