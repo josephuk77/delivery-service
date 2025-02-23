@@ -121,7 +121,7 @@ public class StoreService {
 
   private Store findStore(UUID storeId) {
     return storeRepository.findById(storeId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, "가게를 찾을 수 없습니다."));
+        .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "가게를 찾을 수 없습니다."));
   }
 
   private static void validateStoreOwner(User user, Store store) {
