@@ -78,22 +78,29 @@ public class JwtUtil {
     throw new GlobalException(HttpStatus.BAD_REQUEST, "토큰이 올바르지 않습니다.");
   }
 
-  public boolean validateToken(String token) {
+  public void validateToken(String token) {
     try {
       Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     } catch (SecurityException | MalformedJwtException | SignatureException e) {
       throw new GlobalException(HttpStatus.UNAUTHORIZED,
           "Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
-    } catch (ExpiredJwtException e) {
-      return false;
     } catch (UnsupportedJwtException e) {
       throw new GlobalException(HttpStatus.BAD_REQUEST,
           "Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
     } catch (IllegalArgumentException e) {
       throw new GlobalException(HttpStatus.BAD_REQUEST,
           "JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+    } catch (ExpiredJwtException e) {
+      logger.error(e.getMessage());
     }
+  }
 
+  public boolean checkExpiredToken(String token) {
+    try{
+      Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+    }catch(ExpiredJwtException e){
+      return false;
+    }
     return true;
   }
 

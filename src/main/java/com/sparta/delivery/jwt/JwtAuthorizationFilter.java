@@ -60,10 +60,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
       String refreshToken = redisTemplate.opsForValue().get(accessClaims.getSubject());
 
       // refresh token 이 완전하면
-      if (StringUtils.hasText(refreshToken) && jwtUtil.validateToken(refreshToken)) {
+      jwtUtil.validateToken(refreshToken);
+      if (StringUtils.hasText(refreshToken) && jwtUtil.checkExpiredToken(refreshToken)) {
 
         // access token이 만료되었다면
-        if (!jwtUtil.validateToken(accessToken)) {
+        jwtUtil.validateToken(accessToken);
+        if (!jwtUtil.checkExpiredToken(accessToken)) {
 
           // repository 에서 user 에 관한 정보를 가져옴
           User user = this.userRepository.findByUsername(accessClaims.getSubject()).orElseThrow(()->
