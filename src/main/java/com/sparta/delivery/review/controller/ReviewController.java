@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ReviewController {
 
-  private ReviewService reviewService;
+  private final ReviewService reviewService;
 
   @GetMapping("/{storeId}")
   public ResponseEntity<Page<StoreReviewsResponseDto>> getReviewsByStore(
