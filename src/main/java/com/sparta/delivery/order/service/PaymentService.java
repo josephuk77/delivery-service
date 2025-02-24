@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,9 +44,22 @@ public class PaymentService {
   }
 
   @Transactional(readOnly = true)
-  public List<PaymentResponseDto> getPaymentList(User user) {
-    List<Payment> paymentList = paymentRepository.findAllByUsernameAndDeletedAtIsNull(
-        user.getUsername());
+  public List<PaymentResponseDto> getPaymentList(User user,
+      PaymentStatus paymentStatus,
+      int page,
+      int size,
+      String sortedBy,
+      Sort.Direction direction) {
+    Pageable pageable = PageRequest.of(page, size, direction, sortedBy);
+    List<Payment> paymentList;
+    if (paymentStatus == null) {
+      paymentList = paymentRepository.findAllByUsernameAndDeletedAtIsNull(user.getUsername(),
+          pageable);
+    } else {
+      paymentList = paymentRepository.findAllByUsernameAndStatusAndDeletedAtIsNull(
+          user.getUsername(), paymentStatus, pageable);
+    }
+
     List<PaymentResponseDto> responseDtoList = new ArrayList<>();
 
     for (Payment payment : paymentList) {
