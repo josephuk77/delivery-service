@@ -120,6 +120,8 @@ public class FoodService {
 
     public List<FoodResponseDto> listFoodByStoreId(UUID storeId) {
 
+        this.storeRepository.findById(storeId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "해당하는 가게가 없습니다. "));
+
         return this.foodRepository.findAllByStoreId(storeId).stream()
                 .map(FoodResponseDto::new).toList();
     }
