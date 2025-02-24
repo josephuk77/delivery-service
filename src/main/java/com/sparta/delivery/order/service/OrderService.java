@@ -41,7 +41,7 @@ public class OrderService {
     Store store = storeRepository.findById(UUID.fromString(requestDto.getStoreId()))
         .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "가게를 찾을 수 없습니다."));
 
-    Food food = foodRepository.findById(UUID.fromString(String.valueOf(requestDto.getFoodId())))
+    Food food = foodRepository.findById(UUID.fromString(requestDto.getFoodId()))
         .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "음식을 찾을 수 없습니다."));
 
     Order order = orderRepository.save(
