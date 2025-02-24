@@ -35,7 +35,7 @@ public class OrderFood extends Timestamped {
   @Column(name = "food_name", nullable = false)
   private int quantity;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id")
   private Order order;
 
