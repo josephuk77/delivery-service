@@ -26,13 +26,13 @@ public class OrderFood extends Timestamped {
   @Column(name = "order_food_id", updatable = false, nullable = false)
   private UUID id;
 
-  @Column(name = "order_food_name", nullable = false)
-  private String orderFoodName;
+  @Column(name = "food_name", nullable = false)
+  private String foodName;
 
   @Column(name = "food_price", nullable = false)
   private int foodPrice;
 
-  @Column(name = "food_name", nullable = false)
+  @Column(name = "food_quantity", nullable = false)
   private int quantity;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -44,7 +44,7 @@ public class OrderFood extends Timestamped {
   private Food food;
 
   public OrderFood(Food food, Order order, int quantity) {
-    this.orderFoodName = food.getName();
+    this.foodName = food.getName();
     this.foodPrice = food.getPrice();
     this.quantity = quantity;
     this.order = order;
