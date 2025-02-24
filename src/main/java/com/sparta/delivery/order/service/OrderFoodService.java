@@ -37,6 +37,10 @@ public class OrderFoodService {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 주문된 음식입니다.");
     }
 
+    if (order.getStore().getId().equals(food.getStore().getId())) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "같은 가게의 음식만 주문할 수 있습니다.");
+    }
+
     order.updateTotalPrice(food, requestDto.getQuantity());
 
     orderFoodRepository.save(new OrderFood(food, order, requestDto.getQuantity()));
