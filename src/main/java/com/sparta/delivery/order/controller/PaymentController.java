@@ -2,9 +2,11 @@ package com.sparta.delivery.order.controller;
 
 import com.sparta.delivery.jwt.UserDetailsImpl;
 import com.sparta.delivery.order.dto.PaymentRequestDto;
+import com.sparta.delivery.order.entity.PaymentStatus;
 import com.sparta.delivery.order.service.PaymentService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,8 +34,14 @@ public class PaymentController {
   }
 
   @GetMapping
-  public ResponseEntity<?> getPaymentList(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(paymentService.getPaymentList(userDetails.getUser()));
+  public ResponseEntity<?> getPaymentList(@AuthenticationPrincipal UserDetailsImpl userDetails,
+      @RequestParam(value = "isDelivery", required = false) PaymentStatus paymentStatus,
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size,
+      @RequestParam(value = "sortedBy", defaultValue = "createdAt") String sortedBy,
+      @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction direction) {
+    return ResponseEntity.ok(paymentService.getPaymentList(userDetails.getUser(), paymentStatus,
+        page - 1, size, sortedBy, direction));
   }
 
   @GetMapping("/{paymentId}")

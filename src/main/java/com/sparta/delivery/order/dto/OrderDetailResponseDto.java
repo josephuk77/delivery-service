@@ -30,7 +30,7 @@ public class OrderDetailResponseDto {
     this.request = order.getRequest();
     this.address = order.getAddress();
     this.totalPrice = order.getTotalPrice();
-    this.isDelivery = order.isDelivery();
+    this.isDelivery = order.getIsDelivery();
     this.status = order.getStatus().name();
     this.storeName = store.getName();
     this.storePhone = store.getPhone();

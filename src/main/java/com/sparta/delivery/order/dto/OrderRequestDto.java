@@ -15,7 +15,7 @@ public class OrderRequestDto {
   private String address;
   private String totalPrice;
   private OrderStatus status;
-  private String storeId;
+  private UUID storeId;
   private UUID foodId;
   private int quantity;
 }
