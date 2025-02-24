@@ -1,0 +1,46 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  h2:
+    console:
+      enabled: true
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=MySQL
+    username: SA
+    password: ''
+
+  jpa:
+    database: h2
+    generate-ddl: off
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: false
+        use_sql_comments: false
+
+  data:
+    redis:
+      host: delivery-redis
+      port: 6379
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: off
+        type: warn
+
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+
+admin:
+  key: ${ADMIN_KEY}
+
+gemini:
+  secret:
+    key: ${GEMINI_SECRET_KEY}
