@@ -41,7 +41,7 @@ public class PaymentController {
       @RequestParam(value = "sortedBy", defaultValue = "createdAt") String sortedBy,
       @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction direction) {
     return ResponseEntity.ok(paymentService.getPaymentList(userDetails.getUser(), paymentStatus,
-        page, size, sortedBy, direction));
+        page - 1, size, sortedBy, direction));
   }
 
   @GetMapping("/{paymentId}")

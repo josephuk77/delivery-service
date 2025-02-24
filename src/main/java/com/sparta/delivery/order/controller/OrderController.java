@@ -45,9 +45,8 @@ public class OrderController {
       @RequestParam(value = "size", defaultValue = "10") int size,
       @RequestParam(value = "sortedBy", defaultValue = "createdAt") String sortedBy,
       @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction direction) {
-    return ResponseEntity.ok(orderService.getOrderList(userDetails.getUser(), isDelivery, page,
-        size,
-        sortedBy, direction));
+    return ResponseEntity.ok(orderService.getOrderList(userDetails.getUser(), isDelivery, page - 1,
+        size, sortedBy, direction));
   }
 
   @PutMapping("/{orderId}")
