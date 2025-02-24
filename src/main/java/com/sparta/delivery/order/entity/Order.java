@@ -57,7 +57,7 @@ public class Order extends Timestamped {
 
   public Order(OrderRequestDto requestDto, User user, Store store, Food food, int quantity) {
     this.request = requestDto.getRequest();
-    this.address = requestDto.getAddress();
+    this.address = user.getCurrentAddress();
     this.totalPrice = food.getPrice() * quantity;
     this.isDelivery = false;
     this.status = requestDto.getStatus();

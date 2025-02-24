@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class OrderRequestDto {
 
   private String request;
-  private String address;
   private OrderStatus status;
   private UUID storeId;
   private UUID foodId;
