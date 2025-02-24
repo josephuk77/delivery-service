@@ -63,7 +63,7 @@ public class AddressService {
     checkPermission(user, address);
     address.updateDelete(user.getId());
 
-    if (user.getCurrentAddress().equals(address.getAddress())) {
+    if (address.getAddress().equals(user.getCurrentAddress())) {
       user.updateCurrentAddress(null);
       userRepository.save(user);
     }
