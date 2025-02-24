@@ -17,7 +17,6 @@ public class ReviewRequestDto {
   private Long userId;
   private UUID orderId;
 
-  @NotBlank
   @Min(value = 1, message = "별점은 1-5점 이어야 합니다.")
   @Max(value = 5, message = "별점은 1-5점 이어야 합니다.")
   private Integer star;
