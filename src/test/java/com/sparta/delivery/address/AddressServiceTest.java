@@ -2,6 +2,7 @@ package com.sparta.delivery.address;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.sparta.delivery.aaglobal.GlobalException;
@@ -152,6 +153,22 @@ class AddressServiceTest {
       // then
       assertNotNull(address.getDeletedAt());
       assertEquals(address.getDeletedBy(), user.getId());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("배송지 삭제 성공 - 유저의 현재 주소가 삭제하려는 배송지인 경우")
+    void deleteAddressTest_success_userCase() {
+      // given
+      ReflectionTestUtils.setField(user, "currentAddress", address.getAddress());
+
+      // when
+      addressService.deleteAddress(address.getId(), user);
+
+      // then
+      assertNotNull(address.getDeletedAt());
+      assertEquals(address.getDeletedBy(), user.getId());
+      assertNull(user.getCurrentAddress());
     }
 
     @Test
