@@ -49,6 +49,19 @@ public class OrderController {
         size, sortedBy, direction));
   }
 
+  @GetMapping("/owner/{storeId}")
+  public ResponseEntity<?> getOwnerOrderList(@AuthenticationPrincipal UserDetailsImpl userDetails,
+      @PathVariable UUID storeId,
+      @RequestParam(value = "isDelivery", required = false) Boolean isDelivery,
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size,
+      @RequestParam(value = "sortedBy", defaultValue = "createdAt") String sortedBy,
+      @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction direction) {
+    return ResponseEntity.ok(
+        orderService.getOwnerOrderList(userDetails.getUser(), storeId, isDelivery, page - 1,
+            size, sortedBy, direction));
+  }
+
   @PutMapping("/{orderId}")
   public ResponseEntity<?> updateOrderIsDelivery(@PathVariable UUID orderId,
       @AuthenticationPrincipal UserDetailsImpl userDetails,

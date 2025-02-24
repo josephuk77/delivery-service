@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,11 +62,29 @@ public class OrderService {
       orderList = orderRepository.findAllByUserAndIsDeliveryAndDeletedAtIsNull(user,
           isDelivery, pageable);
     }
-    List<OrderResponseDto> responseDtos = new ArrayList<>();
+    List<OrderResponseDto> responseDtoList = new ArrayList<>();
     for (Order order : orderList) {
-      responseDtos.add(new OrderResponseDto(order, user));
+      responseDtoList.add(new OrderResponseDto(order, user));
     }
-    return responseDtos;
+    return responseDtoList;
+  }
+
+  public Object getOwnerOrderList(User user, UUID storeId, Boolean isDelivery, int page, int size,
+      String sortedBy, Direction direction) {
+    Pageable pageable = PageRequest.of(page, size, direction, sortedBy);
+
+    List<Order> orderList;
+    if (isDelivery == null) {
+      orderList = orderRepository.findAllByStoreIdAndDeletedAtIsNull(storeId, pageable);
+    } else {
+      orderList = orderRepository.findAllByStoreIdAndIsDeliveryAndDeletedAtIsNull(storeId,
+          isDelivery, pageable);
+    }
+    List<OrderResponseDto> responseDtoList = new ArrayList<>();
+    for (Order order : orderList) {
+      responseDtoList.add(new OrderResponseDto(order, user));
+    }
+    return responseDtoList;
   }
 
   @Transactional
@@ -98,7 +117,7 @@ public class OrderService {
   }
 
   private void validateUserOrMaster(User user, Order order) {
-    if (!order.getUser().getId().equals(user.getId()) && !user.getRole()
+    if (!order.getUser().getId().equals(user.getId()) || !user.getRole()
         .equals(UserRoleEnum.MASTER)) {
       throw new GlobalException(HttpStatus.FORBIDDEN, "본인의 주문과 관리자만 수정할 수 있습니다.");
     }
@@ -109,4 +128,13 @@ public class OrderService {
       throw new GlobalException(HttpStatus.FORBIDDEN, "관리자만 주문을 삭제할 수 있습니다.");
     }
   }
+
+  private void validateOwnerOrMaster(User user, Store store) {
+    if ((!user.getRole().equals(UserRoleEnum.OWNER) && store.getUser().equals(user))
+        || !user.getRole()
+        .equals(UserRoleEnum.MASTER)) {
+      throw new GlobalException(HttpStatus.FORBIDDEN, "본인 가게와 관리자만 가게 주문을 조회할 수 있습니다.");
+    }
+  }
+
 }
