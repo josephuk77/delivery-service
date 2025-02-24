@@ -101,8 +101,8 @@ public class PaymentService {
   }
 
   private void validateUserPayment(User user, Payment payment) {
-    if (!payment.getOrder().getUser().getId().equals(user.getId()) ||
-        !user.getRole().equals(UserRoleEnum.MASTER) ||
+    if (!payment.getOrder().getUser().getId().equals(user.getId()) &&
+        !user.getRole().equals(UserRoleEnum.MASTER) &&
         !payment.getOrder().getStore().getUser()
             .getId()
             .equals(user.getId())) {

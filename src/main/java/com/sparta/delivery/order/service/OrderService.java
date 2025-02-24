@@ -117,8 +117,8 @@ public class OrderService {
   }
 
   private void validateUser(User user, Order order) {
-    if (!order.getUser().getId().equals(user.getId()) ||
-        !user.getRole().equals(UserRoleEnum.MASTER) ||
+    if (!order.getUser().getId().equals(user.getId()) &&
+        !user.getRole().equals(UserRoleEnum.MASTER) &&
         !order.getStore().getUser().equals(user)) {
       throw new GlobalException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
     }
