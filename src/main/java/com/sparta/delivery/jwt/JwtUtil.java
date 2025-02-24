@@ -90,16 +90,14 @@ public class JwtUtil {
     } catch (IllegalArgumentException e) {
       throw new GlobalException(HttpStatus.BAD_REQUEST,
           "JWT claims is empty, 잘못된 JWT 토큰 입니다.");
-    } catch (ExpiredJwtException e) {
-      logger.error("Expired JWT Token");
     }
   }
 
   public boolean checkValidatedAndExpiredToken(String token) {
     try{
       validateToken(token);
-      Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     }catch(ExpiredJwtException e){
+//      logger.info("===========token expired==============");
       return false;
     }
     return true;
