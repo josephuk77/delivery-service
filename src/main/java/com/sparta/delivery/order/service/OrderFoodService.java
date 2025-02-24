@@ -40,8 +40,11 @@ public class OrderFoodService {
   @Transactional
   public void updateOrderFood(UUID orderFoodId, User user, int quantity) {
     OrderFood orderFood = validateOrderFoodExists(orderFoodId);
+    Order order = validateOrderExists(orderFood.getOrder().getId());
     validateUserAccess(user, orderFood.getOrder());
 
+    order.minusPrice(orderFood.getFood(), orderFood.getQuantity());
+    order.updateTotalPrice(orderFood.getFood(), quantity);
     orderFood.updateQuantity(quantity);
   }
 
@@ -49,7 +52,10 @@ public class OrderFoodService {
   public void deleteOrderFood(UUID orderFoodId, User user) {
     OrderFood orderFood = validateOrderFoodExists(orderFoodId);
     validateUserAccess(user, orderFood.getOrder());
+    Order order = validateOrderExists(orderFood.getOrder().getId());
 
+    order.minusPrice(orderFood.getFood(), orderFood.getQuantity());
+    
     orderFood.updateDelete(user.getId());
   }
 

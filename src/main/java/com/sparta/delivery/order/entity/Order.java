@@ -72,4 +72,8 @@ public class Order extends Timestamped {
   public void updateTotalPrice(Food food, int quantity) {
     this.totalPrice += food.getPrice() * quantity;
   }
+
+  public void minusPrice(Food food, int quantity) {
+    this.totalPrice -= food.getPrice() * quantity;
+  }
 }
