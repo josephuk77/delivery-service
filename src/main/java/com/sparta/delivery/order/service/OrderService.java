@@ -90,14 +90,14 @@ public class OrderService {
   @Transactional
   public void updateOrderStatus(UUID orderId, boolean isDelivery, User user) {
     Order order = findOrderById(orderId);
-    validateUserOrMaster(user, order);
+    validateUser(user, order);
     order.updateIsDelivery(isDelivery);
   }
 
   @Transactional
   public void deleteOrder(UUID orderId, User user) {
     Order order = findOrderById(orderId);
-    validateMasterRole(user);
+    validateUser(user, order);
     order.updateDelete(user.getId());
   }
 
@@ -116,10 +116,11 @@ public class OrderService {
         .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다."));
   }
 
-  private void validateUserOrMaster(User user, Order order) {
-    if (!order.getUser().getId().equals(user.getId()) || !user.getRole()
-        .equals(UserRoleEnum.MASTER)) {
-      throw new GlobalException(HttpStatus.FORBIDDEN, "본인의 주문과 관리자만 수정할 수 있습니다.");
+  private void validateUser(User user, Order order) {
+    if (!order.getUser().getId().equals(user.getId()) ||
+        !user.getRole().equals(UserRoleEnum.MASTER) ||
+        !order.getStore().getUser().equals(user)) {
+      throw new GlobalException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
     }
   }
 

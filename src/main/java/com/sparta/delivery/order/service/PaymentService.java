@@ -12,6 +12,7 @@ import com.sparta.delivery.order.repository.OrderFoodRepository;
 import com.sparta.delivery.order.repository.OrderRepository;
 import com.sparta.delivery.order.repository.PaymentRepository;
 import com.sparta.delivery.user.entity.User;
+import com.sparta.delivery.user.entity.UserRoleEnum;
 import com.sparta.delivery.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +86,7 @@ public class PaymentService {
     Payment payment = findPaymentById(paymentId);
     validateUserPayment(user, payment);
 
+    payment.updateStatus(PaymentStatus.REFUND);
     payment.updateDelete(user.getId());
   }
 
@@ -98,19 +100,13 @@ public class PaymentService {
         .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "결제를 찾을 수 없습니다."));
   }
 
-  private List<Payment> findPaymentsByStatus(String username, PaymentStatus status,
-      Pageable pageable) {
-    if (status == null) {
-      return paymentRepository.findAllByUsernameAndDeletedAtIsNull(username, pageable);
-    } else {
-      return paymentRepository.findAllByUsernameAndStatusAndDeletedAtIsNull(username, status,
-          pageable);
-    }
-  }
-
   private void validateUserPayment(User user, Payment payment) {
-    if (!payment.getOrder().getUser().getId().equals(user.getId())) {
-      throw new GlobalException(HttpStatus.FORBIDDEN, "본인의 결제만 가능합니다.");
+    if (!payment.getOrder().getUser().getId().equals(user.getId()) ||
+        !user.getRole().equals(UserRoleEnum.MASTER) ||
+        !payment.getOrder().getStore().getUser()
+            .getId()
+            .equals(user.getId())) {
+      throw new GlobalException(HttpStatus.FORBIDDEN, " 결제 접근 권한이 없습니다.");
     }
   }
 

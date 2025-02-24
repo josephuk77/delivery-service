@@ -55,7 +55,7 @@ public class OrderFoodService {
     Order order = validateOrderExists(orderFood.getOrder().getId());
 
     order.minusPrice(orderFood.getFood(), orderFood.getQuantity());
-    
+
     orderFood.updateDelete(user.getId());
   }
 
@@ -70,9 +70,10 @@ public class OrderFoodService {
   }
 
   private void validateUserAccess(User user, Order order) {
-    if (!order.getUser().getId().equals(user.getId()) && !user.getRole()
-        .equals(UserRoleEnum.MASTER)) {
-      throw new GlobalException(HttpStatus.FORBIDDEN, "본인의 주문과 관리자만 가능합니다.");
+    if (!order.getUser().getId().equals(user.getId()) ||
+        !user.getRole().equals(UserRoleEnum.MASTER) ||
+        !order.getStore().getUser().equals(user)) {
+      throw new GlobalException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
     }
   }
 
