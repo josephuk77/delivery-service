@@ -4,6 +4,7 @@ import com.sparta.delivery.food.dto.FoodRequestDto;
 import com.sparta.delivery.food.dto.FoodResponseDto;
 import com.sparta.delivery.food.service.FoodService;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.sparta.delivery.jwt.UserDetailsImpl;
@@ -58,9 +59,15 @@ public class FoodController {
 
     @PatchMapping("/{foodId}")
     public String visibleFood(@PathVariable UUID foodId,
-                              @RequestParam(required = false) boolean isVisible,
+                              @RequestParam(required = true) boolean isVisible,
                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         return this.foodService.visibleFood(foodId, isVisible, userDetails);
+    }
+
+    @GetMapping("/store/{storeId}")
+    public List<FoodResponseDto> listFoodByStoreId(@PathVariable UUID storeId){
+
+        return this.foodService.listFoodByStoreId(storeId);
     }
 }

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -19,10 +20,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
   private final JwtUtil jwtUtil;
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+  private final RedisTemplate<String, String> redisTemplate;
 
-  public JwtAuthenticationFilter(JwtUtil jwtUtil, JwtAuthenticationEntryPoint entryPoint) {
+  public JwtAuthenticationFilter(JwtUtil jwtUtil, JwtAuthenticationEntryPoint entryPoint, RedisTemplate<String, String> redisTemplate) {
     this.jwtUtil = jwtUtil;
     this.jwtAuthenticationEntryPoint = entryPoint;
+    this.redisTemplate = redisTemplate;
     setFilterProcessesUrl("/users/login");
   }
 
@@ -54,6 +57,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     String token = jwtUtil.createAccessToken(username, role);
     jwtUtil.addJwtToHeader(token, response);
+
+    String refreshToken = jwtUtil.createRefreshToken();
+    redisTemplate.opsForValue().set(username, refreshToken);
   }
 
   @Override

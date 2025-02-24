@@ -30,6 +30,14 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
   }
 
+  @PostMapping("/logout")
+  public ResponseEntity<?> logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+    this.userService.logout(userDetails);
+
+    return ResponseEntity.ok("로그아웃 되었습니다. ");
+  }
+
   @PostMapping("/signup/admin")
   public ResponseEntity<?> adminSignup(@Valid @RequestBody UserRequestDto requestDto) {
     userService.adminSignup(requestDto);

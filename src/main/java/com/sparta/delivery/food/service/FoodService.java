@@ -117,4 +117,10 @@ public class FoodService {
             throw new GlobalException(HttpStatus.FORBIDDEN, "해당 권한을 가지고 있지 않습니다. ");
         }
     }
+
+    public List<FoodResponseDto> listFoodByStoreId(UUID storeId) {
+
+        return this.foodRepository.findAllByStoreId(storeId).stream()
+                .map(FoodResponseDto::new).toList();
+    }
 }
