@@ -32,6 +32,11 @@ public class OrderFoodService {
     validateOrderModification(order);
     validateSameStore(order, food);
 
+    if (orderFoodRepository.existsByOrderIdAndFoodIdAndDeletedAtIsNull(order.getId(),
+        food.getId())) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 주문된 음식입니다.");
+    }
+
     order.updateTotalPrice(food, requestDto.getQuantity());
 
     orderFoodRepository.save(new OrderFood(food, order, requestDto.getQuantity()));
