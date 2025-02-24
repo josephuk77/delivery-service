@@ -72,6 +72,9 @@ public class PaymentService {
     Payment payment = paymentRepository.findById(paymentId)
         .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "결제를 찾을 수 없습니다."));
 
+    Order order = orderRepository.findById(payment.getOrder().getId())
+        .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다."));
+
     if (!payment.getOrder().getUser().getId().equals(user.getId())) {
       throw new GlobalException(HttpStatus.FORBIDDEN, "본인의 결제만 결제할 수 있습니다.");
     }
@@ -81,6 +84,7 @@ public class PaymentService {
       throw new GlobalException(HttpStatus.PAYMENT_REQUIRED, "결제 금액이 일치하지 않습니다.");
     }
     payment.updateStatus(PaymentStatus.DONE);
+    order.updateIsDelivery(true);
   }
 
   @Transactional
