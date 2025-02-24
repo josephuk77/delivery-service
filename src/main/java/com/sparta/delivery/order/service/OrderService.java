@@ -30,46 +30,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderService {
 
   private final OrderRepository orderRepository;
-
   private final StoreRepository storeRepository;
-
   private final OrderFoodRepository orderFoodRepository;
-
   private final FoodRepository foodRepository;
 
   public void createOrder(OrderRequestDto requestDto, User user) {
-    Store store = storeRepository.findById(UUID.fromString(requestDto.getStoreId()))
-        .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "가게를 찾을 수 없습니다."));
-
-    Food food = foodRepository.findById(UUID.fromString(requestDto.getFoodId()))
-        .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "음식을 찾을 수 없습니다."));
+    Store store = findStoreById(requestDto.getStoreId());
+    Food food = findFoodById(requestDto.getFoodId());
 
     Order order = orderRepository.save(
         new Order(requestDto, user, store, food, requestDto.getQuantity()));
-
     orderFoodRepository.save(new OrderFood(food, order, requestDto.getQuantity()));
   }
 
   @Transactional(readOnly = true)
   public OrderDetailResponseDto getOrderDetail(UUID orderId, User user) {
-    Order order = orderRepository.findById(orderId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다."));
-
-    Store store = storeRepository.findById(order.getStore().getId())
-        .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "가게를 찾을 수 없습니다."));
-
+    Order order = findOrderById(orderId);
     List<OrderFood> orderFoodList = orderFoodRepository.findByOrderIdAndDeletedAtIsNull(orderId);
-
-    return new OrderDetailResponseDto(order, store, user, orderFoodList);
+    return new OrderDetailResponseDto(order, order.getStore(), user, orderFoodList);
   }
 
   @Transactional(readOnly = true)
-  public List<OrderResponseDto> getOrderList(User user,
-      Boolean isDelivery,
-      int page,
-      int size,
-      String sortedBy,
-      Sort.Direction direction) {
+  public List<OrderResponseDto> getOrderList(User user, Boolean isDelivery, int page, int size,
+      String sortedBy, Sort.Direction direction) {
     Pageable pageable = PageRequest.of(page, size, direction, sortedBy);
     List<Order> orderList;
     if (isDelivery == null) {
@@ -78,38 +61,52 @@ public class OrderService {
       orderList = orderRepository.findAllByUserAndIsDeliveryAndDeletedAtIsNull(user,
           isDelivery, pageable);
     }
-
-    List<OrderResponseDto> requestDtoList = new ArrayList<>();
-
+    List<OrderResponseDto> responseDtos = new ArrayList<>();
     for (Order order : orderList) {
-      requestDtoList.add(new OrderResponseDto(order, user));
+      responseDtos.add(new OrderResponseDto(order, user));
     }
-    return requestDtoList;
+    return responseDtos;
   }
 
   @Transactional
   public void updateOrderStatus(UUID orderId, boolean isDelivery, User user) {
-    Order order = orderRepository.findById(orderId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다."));
-
-    if (!order.getUser().getId().equals(user.getId()) || user.getRole()
-        .equals(UserRoleEnum.MASTER)) {
-      throw new GlobalException(HttpStatus.NOT_FOUND, "본인의 주문과 관리자만 수정할 수 있습니다.");
-    }
-
+    Order order = findOrderById(orderId);
+    validateUserOrMaster(user, order);
     order.updateIsDelivery(isDelivery);
   }
 
   @Transactional
   public void deleteOrder(UUID orderId, User user) {
-    Order order = orderRepository.findById(orderId)
-        .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다."));
-
-    if (user.getRole().equals(UserRoleEnum.MASTER)) {
-      throw new GlobalException(HttpStatus.FORBIDDEN, "관리자만 주문을 삭제할 수 있습니다.");
-    }
-
+    Order order = findOrderById(orderId);
+    validateMasterRole(user);
     order.updateDelete(user.getId());
   }
 
+  private Store findStoreById(String storeId) {
+    return storeRepository.findById(UUID.fromString(storeId))
+        .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "가게를 찾을 수 없습니다."));
+  }
+
+  private Food findFoodById(String foodId) {
+    return foodRepository.findById(UUID.fromString(foodId))
+        .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "음식을 찾을 수 없습니다."));
+  }
+
+  private Order findOrderById(UUID orderId) {
+    return orderRepository.findById(orderId)
+        .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다."));
+  }
+
+  private void validateUserOrMaster(User user, Order order) {
+    if (!order.getUser().getId().equals(user.getId()) && !user.getRole()
+        .equals(UserRoleEnum.MASTER)) {
+      throw new GlobalException(HttpStatus.FORBIDDEN, "본인의 주문과 관리자만 수정할 수 있습니다.");
+    }
+  }
+
+  private void validateMasterRole(User user) {
+    if (!user.getRole().equals(UserRoleEnum.MASTER)) {
+      throw new GlobalException(HttpStatus.FORBIDDEN, "관리자만 주문을 삭제할 수 있습니다.");
+    }
+  }
 }
