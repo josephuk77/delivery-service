@@ -96,7 +96,7 @@ public class GeminiService {
     }
 
     private Map<String, Object> createMapObject(String question) {
-        return Map.of("contents", List.of(Map.of("parts", List.of(Map.of("text", question)))));
+        return Map.of("contents", List.of(Map.of("parts", List.of(Map.of("text", question + " 조건: 답변을 최대한 간결하게 50자 이하로")))));
     }
 
     private String sendGeminiAndGetJsonData(Map<String, Object> requestBody) {
