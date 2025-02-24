@@ -10,11 +10,11 @@ import com.sparta.delivery.order.repository.OrderFoodRepository;
 import com.sparta.delivery.order.repository.OrderRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
-import jakarta.transaction.Transactional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

@@ -14,13 +14,13 @@ import com.sparta.delivery.store.entity.Store;
 import com.sparta.delivery.store.repository.StoreRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.entity.UserRoleEnum;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +47,7 @@ public class OrderService {
     orderFoodRepository.save(new OrderFood(food, order, requestDto.getQuantity()));
   }
 
+  @Transactional(readOnly = true)
   public OrderDetailResponseDto getOrderDetail(UUID orderId, User user) {
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다."));
@@ -59,6 +60,7 @@ public class OrderService {
     return new OrderDetailResponseDto(order, store, user, orderFoodList);
   }
 
+  @Transactional(readOnly = true)
   public List<OrderResponseDto> getOrderList(User user) {
     List<Order> orderList = orderRepository.findAllByUserAndDeletedAtIsNull(user);
     List<OrderResponseDto> requestDtoList = new ArrayList<>();

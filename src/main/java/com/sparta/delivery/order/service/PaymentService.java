@@ -13,13 +13,13 @@ import com.sparta.delivery.order.repository.OrderRepository;
 import com.sparta.delivery.order.repository.PaymentRepository;
 import com.sparta.delivery.user.entity.User;
 import com.sparta.delivery.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +40,7 @@ public class PaymentService {
     paymentRepository.save(new Payment(requestDto, user, order));
   }
 
+  @Transactional(readOnly = true)
   public List<PaymentResponseDto> getPaymentList(User user) {
     List<Payment> paymentList = paymentRepository.findAllByUsernameAndDeletedAtIsNull(
         user.getUsername());
@@ -51,6 +52,7 @@ public class PaymentService {
     return responseDtoList;
   }
 
+  @Transactional(readOnly = true)
   public PaymentDetailResponseDto getPaymentDetail(UUID paymentId, User user) {
     Payment payment = paymentRepository.findById(paymentId)
         .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "결제를 찾을 수 없습니다."));
