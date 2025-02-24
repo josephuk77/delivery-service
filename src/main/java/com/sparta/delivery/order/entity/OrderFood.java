@@ -45,7 +45,7 @@ public class OrderFood extends Timestamped {
 
   public OrderFood(Food food, Order order, int quantity) {
     this.foodName = food.getName();
-    this.foodPrice = food.getPrice();
+    this.foodPrice = food.getPrice() * quantity;
     this.quantity = quantity;
     this.order = order;
     this.food = food;

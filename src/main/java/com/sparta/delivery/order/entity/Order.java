@@ -68,4 +68,8 @@ public class Order extends Timestamped {
   public void updateIsDelivery(boolean isDelivery) {
     this.isDelivery = isDelivery;
   }
+
+  public void updateTotalPrice(Food food, int quantity) {
+    this.totalPrice += food.getPrice() * quantity;
+  }
 }

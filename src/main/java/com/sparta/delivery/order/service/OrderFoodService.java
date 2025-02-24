@@ -24,12 +24,15 @@ public class OrderFoodService {
   private final OrderFoodRepository orderFoodRepository;
   private final FoodRepository foodRepository;
 
+  @Transactional
   public void addOrderFood(OrderFoodRequestDto requestDto, User user) {
     Order order = validateOrderExists(requestDto.getOrderId());
     Food food = validateFoodExists(requestDto.getFoodId());
     validateUserAccess(user, order);
     validateOrderModification(order);
     validateSameStore(order, food);
+
+    order.updateTotalPrice(food, requestDto.getQuantity());
 
     orderFoodRepository.save(new OrderFood(food, order, requestDto.getQuantity()));
   }
