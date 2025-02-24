@@ -68,7 +68,7 @@ public class OrderFoodService {
   }
 
   private void validateOrderModification(Order order) {
-    if (!order.getIsDelivery()) {
+    if (order.getIsDelivery()) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "완료된 주문은 수정할 수 없습니다.");
     }
   }
