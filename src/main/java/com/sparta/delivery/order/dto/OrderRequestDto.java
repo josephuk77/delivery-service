@@ -1,6 +1,7 @@
 package com.sparta.delivery.order.dto;
 
 import com.sparta.delivery.order.entity.OrderStatus;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ public class OrderRequestDto {
   private String address;
   private String totalPrice;
   private OrderStatus status;
-  private String storeId;
-  private String foodId;
+  private UUID storeId;
+  private UUID foodId;
   private int quantity;
 }

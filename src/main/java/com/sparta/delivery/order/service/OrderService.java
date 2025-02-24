@@ -82,13 +82,13 @@ public class OrderService {
     order.updateDelete(user.getId());
   }
 
-  private Store findStoreById(String storeId) {
-    return storeRepository.findById(UUID.fromString(storeId))
+  private Store findStoreById(UUID storeId) {
+    return storeRepository.findById(storeId)
         .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "가게를 찾을 수 없습니다."));
   }
 
-  private Food findFoodById(String foodId) {
-    return foodRepository.findById(UUID.fromString(foodId))
+  private Food findFoodById(UUID foodId) {
+    return foodRepository.findById(foodId)
         .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, "음식을 찾을 수 없습니다."));
   }
 
