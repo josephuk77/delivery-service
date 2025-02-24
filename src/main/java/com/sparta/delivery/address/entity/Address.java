@@ -34,7 +34,7 @@ public class Address extends Timestamped {
   @Column(name = "address_name")
   private String name;
 
-  @Column
+  @Column(nullable = false)
   private String address;
 
   @ManyToOne(fetch = FetchType.LAZY)
