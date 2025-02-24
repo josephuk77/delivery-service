@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,8 +64,21 @@ public class OrderService {
   }
 
   @Transactional(readOnly = true)
-  public List<OrderResponseDto> getOrderList(User user) {
-    List<Order> orderList = orderRepository.findAllByUserAndDeletedAtIsNull(user);
+  public List<OrderResponseDto> getOrderList(User user,
+      Boolean isDelivery,
+      int page,
+      int size,
+      String sortedBy,
+      Sort.Direction direction) {
+    Pageable pageable = PageRequest.of(page, size, direction, sortedBy);
+    List<Order> orderList;
+    if (isDelivery == null) {
+      orderList = orderRepository.findAllByUserAndDeletedAtIsNull(user, pageable);
+    } else {
+      orderList = orderRepository.findAllByUserAndIsDeliveryAndDeletedAtIsNull(user,
+          isDelivery, pageable);
+    }
+
     List<OrderResponseDto> requestDtoList = new ArrayList<>();
 
     for (Order order : orderList) {

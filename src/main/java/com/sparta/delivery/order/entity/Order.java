@@ -41,7 +41,7 @@ public class Order extends Timestamped {
   private int totalPrice;
 
   @Column(name = "is_delivery", nullable = false)
-  private boolean isDelivery = false;
+  private Boolean isDelivery = false;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "order_status", nullable = false)

@@ -36,7 +36,7 @@ public class OrderFoodService {
       throw new GlobalException(HttpStatus.FORBIDDEN, "본인의 주문과 관리자만 추가할 수 있습니다.");
     }
 
-    if (!order.isDelivery()) {
+    if (!order.getIsDelivery()) {
       throw new GlobalException(HttpStatus.BAD_REQUEST, "완료된 주문은 수정할 수 없습니다.");
     }
 

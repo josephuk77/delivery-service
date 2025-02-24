@@ -5,6 +5,7 @@ import com.sparta.delivery.order.dto.OrderRequestDto;
 import com.sparta.delivery.order.service.OrderService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,8 +39,15 @@ public class OrderController {
   }
 
   @GetMapping
-  public ResponseEntity<?> getOrderList(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(orderService.getOrderList(userDetails.getUser()));
+  public ResponseEntity<?> getOrderList(@AuthenticationPrincipal UserDetailsImpl userDetails,
+      @RequestParam(value = "isDelivery", required = false) Boolean isDelivery,
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size,
+      @RequestParam(value = "sortedBy", defaultValue = "createdAt") String sortedBy,
+      @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction direction) {
+    return ResponseEntity.ok(orderService.getOrderList(userDetails.getUser(), isDelivery, page,
+        size,
+        sortedBy, direction));
   }
 
   @PutMapping("/{orderId}")
