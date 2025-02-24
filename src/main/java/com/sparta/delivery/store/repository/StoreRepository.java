@@ -2,13 +2,16 @@ package com.sparta.delivery.store.repository;
 
 import com.sparta.delivery.store.entity.Store;
 import com.sparta.delivery.store.entity.StoreCategory;
+import java.math.BigDecimal;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface StoreRepository extends JpaRepository<Store, UUID> {
@@ -18,4 +21,9 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 
   @Query("SELECT s FROM Store s WHERE s.category = :category AND s.deletedAt IS NULL")
   Page<Store> findAllByCategory(@Param("category") StoreCategory storeCategory, Pageable pageable);
+
+  @Transactional
+  @Modifying
+  @Query("UPDATE Store s SET s.reviewCount = :reviewCount, s.ratingAvg = :ratingAvg WHERE s.id = :storeId")
+  void updateReviewStatistics(UUID storeId, Integer reviewCount, BigDecimal avgRating);
 }
