@@ -118,9 +118,9 @@ public class FoodService {
         }
     }
 
-    public Page<FoodResponseDto> listFoodByStoreId(UUID storeId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        List<FoodResponseDto> listDto = this.foodRepository.findByStoreId(storeId, pageable).stream().map(FoodResponseDto::new).toList();
-        return new PageImpl<>(listDto, pageable, listDto.size());
+    public List<FoodResponseDto> listFoodByStoreId(UUID storeId) {
+
+        return this.foodRepository.findAllByStoreId(storeId).stream()
+                .map(FoodResponseDto::new).toList();
     }
 }

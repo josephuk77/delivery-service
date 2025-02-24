@@ -4,6 +4,7 @@ import com.sparta.delivery.food.dto.FoodRequestDto;
 import com.sparta.delivery.food.dto.FoodResponseDto;
 import com.sparta.delivery.food.service.FoodService;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.sparta.delivery.jwt.UserDetailsImpl;
@@ -65,10 +66,8 @@ public class FoodController {
     }
 
     @GetMapping("/store/{storeId}")
-    public Page<FoodResponseDto> listFoodByStoreId(@PathVariable UUID storeId,
-                                                   @RequestParam(defaultValue = "0") int page,
-                                                   @RequestParam(defaultValue = "10") int size){
+    public List<FoodResponseDto> listFoodByStoreId(@PathVariable UUID storeId){
 
-        return this.foodService.listFoodByStoreId(storeId, page, size);
+        return this.foodService.listFoodByStoreId(storeId);
     }
 }
