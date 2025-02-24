@@ -25,5 +25,5 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
   @Transactional
   @Modifying
   @Query("UPDATE Store s SET s.reviewCount = :reviewCount, s.ratingAvg = :ratingAvg WHERE s.id = :storeId")
-  void updateReviewStatistics(UUID storeId, Integer reviewCount, BigDecimal avgRating);
+  void updateReviewStatistics(UUID storeId, Integer reviewCount, BigDecimal ratingAvg);
 }

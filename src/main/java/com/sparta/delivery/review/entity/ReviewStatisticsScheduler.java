@@ -47,9 +47,9 @@ public class ReviewStatisticsScheduler {
           UUID storeId = UUID.fromString(storeIdObj.toString());
 
           Integer reviewCount = reviewRepository.countByStoreId(storeId);
-          BigDecimal avgRating = reviewRepository.calculateAverageRatingByStoreId(storeId);
+          BigDecimal ratingAvg = reviewRepository.calculateAverageRatingByStoreId(storeId);
 
-          storeRepository.updateReviewStatistics(storeId, reviewCount, avgRating);
+          storeRepository.updateReviewStatistics(storeId, reviewCount, ratingAvg);
           log.info("가게 {} 통계 업데이트 완료", storeId);
         }
         // 업데이트 후 추적 리스트 비우기
