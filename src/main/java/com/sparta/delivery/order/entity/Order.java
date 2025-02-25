@@ -57,7 +57,7 @@ public class Order extends Timestamped {
 
   public Order(OrderRequestDto requestDto, User user, Store store, Food food, int quantity) {
     this.request = requestDto.getRequest();
-    this.address = requestDto.getAddress();
+    this.address = user.getCurrentAddress();
     this.totalPrice = food.getPrice() * quantity;
     this.isDelivery = false;
     this.status = requestDto.getStatus();
@@ -67,5 +67,13 @@ public class Order extends Timestamped {
 
   public void updateIsDelivery(boolean isDelivery) {
     this.isDelivery = isDelivery;
+  }
+
+  public void updateTotalPrice(Food food, int quantity) {
+    this.totalPrice += food.getPrice() * quantity;
+  }
+
+  public void minusPrice(Food food, int quantity) {
+    this.totalPrice -= food.getPrice() * quantity;
   }
 }
