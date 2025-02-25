@@ -1,13 +1,5 @@
-# :pushpin: AI 배달 서비드(Backend)
+# :pushpin: AI 배달 서비스(REST API SERVER)
 
-
-
-## Production
-
-
-## 📹 Demo Video
-클릭하시면 영상을 볼 수 있습니다. <br /><br />
-[![Video Label]()
 
 ## 📁 System Architecture
 <img width="717" alt="image" src="https://github.com/user-attachments/assets/10031dc2-6047-4a50-97bd-5d4c3a2d659d" />
