@@ -37,8 +37,14 @@ public class FoodService {
         UUID storeId = requestDto.getStoreId();
 
         if (storeId != null) {
-            Store store = storeRepository.findById(storeId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 storeId 입니다. "));
 
+            Store store = storeRepository.findById(storeId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 storeId 입니다. "));
+            if(!store.getUser().getUsername().equals(userDetails.getUsername())){
+                log.info("store.getUser().getUsername() = " + store.getUser().getUsername());
+                log.info("userDetails.getUsername() = " + userDetails.getUsername());
+
+                throw new GlobalException(HttpStatus.FORBIDDEN, "생성권한이 없습니다. ");
+            }
             food.updateStore(store);
         }
 
@@ -74,6 +80,10 @@ public class FoodService {
         if (storeId != null) {
 
             Store store = storeRepository.findById(storeId).orElseThrow(() -> new GlobalException(HttpStatus.NO_CONTENT, "존재하지 않는 storeId 입니다. "));
+            if(!store.getUser().getUsername().equals(userDetails.getUsername())){
+                throw new GlobalException(HttpStatus.FORBIDDEN, "업데이트 권한이 없습니다. ");
+            }
+
             food.updateStore(store);
         }
 
