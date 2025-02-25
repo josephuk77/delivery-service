@@ -1,0 +1,52 @@
+spring:
+  application:
+    name:
+      delivery
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+  sql:
+    init:
+      mode: always
+
+  data:
+    redis:
+      host: delivery-redis
+      port: 6379
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type: trace
+
+springdoc:
+  show-login-endpoint: true
+
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+
+admin:
+  key: ${ADMIN_KEY}
+
+gemini:
+  secret:
+    key: ${GEMINI_SECRET_KEY}
