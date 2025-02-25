@@ -14,7 +14,6 @@ services:
       - ./src/main/java:/delivery/src/main/java  # ✅ Java 소스 코드 동기화
       - ./src/main/resources:/delivery/src/main/resources  # ✅ 설정 파일 동기화
     working_dir: /delivery
-    command: ./gradlew bootRun --continuous  # ✅ JAR 빌드 없이 실행
 
   db:
     image: postgres
@@ -35,8 +34,7 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: ["redis-server", "--appendonly", "yes", "--bind", "0.0.0.0"]  # ✅ 외부 접근 허용
-
+    command: [ "redis-server", "--appendonly", "yes", "--bind", "0.0.0.0" ]  # ✅ 외부 접근 허용
 
   pgadmin:
     image: dpage/pgadmin4
