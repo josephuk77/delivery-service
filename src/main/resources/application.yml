@@ -4,10 +4,11 @@ spring:
       delivery
 
   datasource:
-    url: jdbc:postgresql://delivery-db:5432/delivery
-    username: myuser
-    password: mypassword
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -16,6 +17,7 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
+
   sql:
     init:
       mode: always
