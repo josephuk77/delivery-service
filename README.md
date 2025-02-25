@@ -1,4 +1,4 @@
-# :pushpin: AI 배달 서비스(REST API SERVER)
+# :pushpin: AI 배달 서비스(REST API SERVER)
 
 
 ## 📁 System Architecture
