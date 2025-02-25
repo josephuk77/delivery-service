@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +24,7 @@ public class OrderFoodController {
   private final OrderFoodService orderFoodService;
 
   @PostMapping
-  public ResponseEntity<?> addOrderFood(OrderFoodRequestDto requestDto,
+  public ResponseEntity<?> addOrderFood(@RequestBody OrderFoodRequestDto requestDto,
       @AuthenticationPrincipal UserDetailsImpl userDetails) {
     orderFoodService.addOrderFood(requestDto, userDetails.getUser());
     return ResponseEntity.ok().build();

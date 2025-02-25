@@ -53,7 +53,7 @@ public class AddressService {
   public void updateCurrentAddress(UUID addressID, User user) {
     Address address = findAddress(addressID);
     checkPermission(user, address);
-    user.updateCurrentAddress(address);
+    user.updateCurrentAddress(address.getAddress());
     userRepository.save(user);
   }
 
@@ -62,6 +62,11 @@ public class AddressService {
     Address address = findAddress(addressID);
     checkPermission(user, address);
     address.updateDelete(user.getId());
+
+    if (address.getAddress().equals(user.getCurrentAddress())) {
+      user.updateCurrentAddress(null);
+      userRepository.save(user);
+    }
   }
 
   private Address findAddress(UUID addressID) {

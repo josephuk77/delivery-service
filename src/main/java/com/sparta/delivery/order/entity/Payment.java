@@ -44,7 +44,7 @@ public class Payment extends Timestamped {
   private Order order;
 
   public Payment(PaymentRequestDto requestDto, User user, Order order) {
-    this.username = user.getNickname();
+    this.username = user.getUsername();
     this.price = requestDto.getPrice();
     this.status = requestDto.getStatus();
     this.order = order;
