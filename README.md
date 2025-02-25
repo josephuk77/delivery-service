@@ -132,3 +132,4 @@ Area| Tech Stack|
 | Profile |<center><img width="110px" height="110px" src="https://github.com/2023SVBootcamp-Team-A/project/assets/8746067/b0476434-30fd-4222-b98d-21178e774189" /></center>|<center><img width="110px" height="110px" src="https://github.com/user-attachments/assets/31cb0b3e-9acb-4d16-99b5-b21ad2d701e7" /></center>|<center><img width="110px" height="110px" src="" /></center>|<center><img width="110px" height="110px" src="" /></center>|
 | Role    | <center>주문, 결제<br> 구현</center> | <center></center> | <center></center> | <center></center> |
 GitHub | <center>[@josephuk77](https://github.com/josephuk77)</center> | <center>[@jhwan](https://github.com/JeongHwan95) </center>| <center>[@Kim JiHyun](https://github.com/zomeong) </center>| <center>[@Oh YeonJoo](https://github.com/oyeonjoo)</center>
+
