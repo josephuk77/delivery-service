@@ -1,5 +1,5 @@
 # :pushpin: AI 배달 서비스(REST API SERVER)
-
+배달 및 포장 주문 관리 플랫폼은 음식점을 대상으로 한 서비스로, 온라인과 대면 주문을 모두 지원합니다. 백엔드 중심 개발로 관리자 화면을 우선 구현하며, 카드 결제, AI 기반 상품 설명 생성, 고객/가게/관리자 권한 관리 기능을 제공합니다.
 
 ## 📁 System Architecture
 <img width="717" alt="image" src="https://github.com/user-attachments/assets/10031dc2-6047-4a50-97bd-5d4c3a2d659d" />
