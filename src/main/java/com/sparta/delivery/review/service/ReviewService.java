@@ -59,7 +59,6 @@ public class ReviewService {
   @Transactional
   public ReviewResponseDto createReview(ReviewRequestDto requestDto, User user) {
     validateCustomer(user);
-
     Order order = findOrder(requestDto);
 
     validateOrderUser(user, order);
@@ -67,7 +66,10 @@ public class ReviewService {
     // 3일 제한 검증
     validateReviewPeriod(order);
 
-    Review review = reviewRepository.save(new Review(requestDto, user));
+    // 중복 리뷰 체크
+    validateReviewDuplicate(requestDto);
+
+    Review review = reviewRepository.save(new Review(requestDto, user, order.getStore(), order));
 
     // 리뷰 생성 시 해당 가게 ID 추적
     reviewStatisticsScheduler.trackStoreId(review.getStore().getId());
@@ -137,6 +139,12 @@ public class ReviewService {
 
     if (LocalDateTime.now().isAfter(reviewDeadline)) {
       throw new GlobalException(HttpStatus.FORBIDDEN, "주문 후 3일 이내에만 리뷰를 작성/수정할 수 있습니다");
+    }
+  }
+
+  private void validateReviewDuplicate(ReviewRequestDto requestDto) {
+    if (reviewRepository.existsByOrderId(requestDto.getOrderId())) {
+      throw new GlobalException(HttpStatus.BAD_REQUEST, "이미 리뷰가 등록된 주문입니다.");
     }
   }
 

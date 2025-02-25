@@ -18,4 +18,6 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
   @Query("SELECT AVG(r.star) FROM Review r WHERE r.store.id = :storeId AND r.deletedAt IS NULL")
   BigDecimal calculateAverageRatingByStoreId(UUID storeId);
+
+  boolean existsByOrderId(UUID orderId);
 }

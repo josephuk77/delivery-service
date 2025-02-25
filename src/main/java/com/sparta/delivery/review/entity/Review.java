@@ -49,8 +49,9 @@ public class Review extends Timestamped {
   @JoinColumn(name = "store_id")
   private Store store;
 
-  public Review(ReviewRequestDto requestDto, User user) {
-    this.id = requestDto.getOrderId();
+  public Review(ReviewRequestDto requestDto, User user, Store store, Order order) {
+    this.order = order;
+    this.store = store;
     this.star = requestDto.getStar();
     this.content = requestDto.getContent();
     this.user = user;

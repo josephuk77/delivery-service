@@ -29,7 +29,9 @@ public class ReviewStatisticsScheduler {
 
   // 리뷰 변경 시 호출하여 변경된 가게를 추적
   public void trackStoreId(UUID storeId) {
+    log.info("trackStoreId 호출됨: {}", storeId);
     redisTemplate.opsForSet().add(UPDATED_STORE_ID_KEY, storeId.toString());
+    log.info("Redis에 저장 요청: {}", storeId);
     redisTemplate.expire(UPDATED_STORE_ID_KEY, TTL_IN_SECONDS, TimeUnit.SECONDS);
   }
 
@@ -47,13 +49,15 @@ public class ReviewStatisticsScheduler {
           UUID storeId = UUID.fromString(storeIdObj.toString());
 
           Integer reviewCount = reviewRepository.countByStoreId(storeId);
-          BigDecimal avgRating = reviewRepository.calculateAverageRatingByStoreId(storeId);
+          BigDecimal ratingAvg = reviewRepository.calculateAverageRatingByStoreId(storeId);
 
-          storeRepository.updateReviewStatistics(storeId, reviewCount, avgRating);
+          storeRepository.updateReviewStatistics(storeId, reviewCount, ratingAvg);
           log.info("가게 {} 통계 업데이트 완료", storeId);
         }
         // 업데이트 후 추적 리스트 비우기
+        log.info("삭제 전 키 존재 여부: {}", redisTemplate.hasKey(UPDATED_STORE_ID_KEY));
         redisTemplate.delete(UPDATED_STORE_ID_KEY);
+        log.info("삭제 후 키 존재 여부: {}", redisTemplate.hasKey(UPDATED_STORE_ID_KEY));
       } else {
         log.info("변경된 가게가 없습니다.");
       }
