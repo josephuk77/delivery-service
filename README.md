@@ -13,9 +13,9 @@
 <img width="717" alt="image" src="https://github.com/user-attachments/assets/10031dc2-6047-4a50-97bd-5d4c3a2d659d" />
 
 ## 💾 ERD
+<img width="1009" alt="image" src="https://github.com/user-attachments/assets/11bc9b50-71b2-42f2-a2f6-1298ceeb51c8" />
 
 ## 🛠 Installation
-<img width="1009" alt="image" src="https://github.com/user-attachments/assets/11bc9b50-71b2-42f2-a2f6-1298ceeb51c8" />
 
 ### 사용설명서
 준비물
@@ -121,7 +121,7 @@ Area| Tech Stack|
 **Backend** |  <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat-square&logo=Spring&logoColor=white"> <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=PostgreSQL&logoColor=white"> 
 **AI** | <img src="https://img.shields.io/badge/Google-Gemini-yellow?style=for-the-badge&logo=google"> 
 **DevOps** | <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/Amazon_EC2-FF9900?style=for-the-badge&logo=Amazon-EC2&logoColor=black">
-**etc** | ![GitHub](https://img.shields.io/static/v1?style=for-the-badge&message=GitHub&color=181717&logo=GitHub&logoColor=FFFFFF&label=) ![Slack](https://img.shields.io/static/v1?style=for-the-badge&message=Slack&color=4A154B&logo=Slack&logoColor=FFFFFF&label=) ![Notion](https://img.shields.io/static/v1?style=for-the-badge&message=Notion&color=000000&logo=Notion&logoColor=FFFFFF&label=) ![Postman](https://img.shields.io/static/v1?style=for-the-badge&message=Postman&color=FF6C37&logo=Postman&logoColor=FFFFFF&label=) <img src="https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black"> https://img.shields.io/badge/Intellij%20Idea-000?logo=intellij-idea&style=for-the-badge
+**etc** | ![GitHub](https://img.shields.io/static/v1?style=for-the-badge&message=GitHub&color=181717&logo=GitHub&logoColor=FFFFFF&label=) ![Slack](https://img.shields.io/static/v1?style=for-the-badge&message=Slack&color=4A154B&logo=Slack&logoColor=FFFFFF&label=) ![Notion](https://img.shields.io/static/v1?style=for-the-badge&message=Notion&color=000000&logo=Notion&logoColor=FFFFFF&label=) ![Postman](https://img.shields.io/static/v1?style=for-the-badge&message=Postman&color=FF6C37&logo=Postman&logoColor=FFFFFF&label=) <img src="https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black"> <img src="https://img.shields.io/badge/Intellij%20Idea-000?logo=intellij-idea&style=for-the-badge">
 
 
 - - - 
@@ -131,4 +131,4 @@ Area| Tech Stack|
 | ------- | --------------------------------------- | --------------------------------------- | --------------------------------------- | --------------------------------------- |
 | Profile |<center><img width="110px" height="110px" src="https://github.com/2023SVBootcamp-Team-A/project/assets/8746067/b0476434-30fd-4222-b98d-21178e774189" /></center>|<center><img width="110px" height="110px" src="" /></center>|<center><img width="110px" height="110px" src="" /></center>|<center><img width="110px" height="110px" src="" /></center>|
 | Role    | <center>주문, 결제<br> 구현</center> | <center></center> | <center></center> | <center></center> |
-GitHub | <center>[@josephuk77](https://github.com/josephuk77)</center> | <center>[@LeeTaek2T](https://github.com/jhwan) </center>| <center>[@V2LLAIN](https://github.com/zomeong) </center>| <center>[@youngjin516](https://github.com/oyeonjoo)</center>
+GitHub | <center>[@josephuk77](https://github.com/josephuk77)</center> | <center>[@jhwan](https://github.com/jhwan) </center>| <center>[@Kim JiHyun](https://github.com/zomeong) </center>| <center>[@Oh YeonJoo](https://github.com/oyeonjoo)</center>
