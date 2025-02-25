@@ -6,7 +6,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8080:8080"
+      - "80:8080"
     depends_on:
       - db
     container_name: delivery-backend
@@ -14,6 +14,11 @@ services:
       - ./src/main/java:/delivery/src/main/java  # ✅ Java 소스 코드 동기화
       - ./src/main/resources:/delivery/src/main/resources  # ✅ 설정 파일 동기화
     working_dir: /delivery
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "400M"
 
   db:
     image: postgres
@@ -26,6 +31,11 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "300M"
 
   redis:
     image: redis:latest
@@ -34,6 +44,11 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: "150M"
     command: [ "redis-server", "--appendonly", "yes", "--bind", "0.0.0.0" ]  # ✅ 외부 접근 허용
 
   pgadmin:
@@ -44,6 +59,11 @@ services:
     ports:
       - "8088:80"
     container_name: delivery-pgadmin
+    deploy:
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: "150M"
 
 volumes:
   db_data:
